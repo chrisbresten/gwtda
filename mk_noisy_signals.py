@@ -1,3 +1,4 @@
+from spectralnoise import SpectralPerterbator
 import sys
 from embeddings import slidend, dimred3, padrand
 import numpy as np
@@ -13,7 +14,7 @@ try:
     signal_type = sys.argv[1]
     if len(sys.argv) > 2:
         Ndattotal = int(sys.argv[2])
-except (IndexError,ValueError):
+except (IndexError, ValueError):
     SystemExit(
         f"Usage {sys.argv[0]} <signal type gw | chirps | ligo | whitenoise> <Ndata> \n whre (optional) Ndata is total elements to create"
     )
@@ -63,9 +64,11 @@ elif signal_type == "ligo":
     ncoeff = 0.05
     y_init = np.concatenate(tuple(gwpre[1]), 0)
     signals = np.concatenate(tuple(gwpre[0]), 0)
-    # freqs = np.fft.fft(signals)
+    spe = SpectralPerterbator()
+    spe.train(signals)
+    # signals = spe.proc(signals)
 else:
-    Nsamp=4;
+    Nsamp = 4
     ncoeff = 0.5
     name = "gw"
     signals = gwwhitenoise()
@@ -79,21 +82,36 @@ ybin = []
 pcloud = []
 maxs = 0.0
 k = 0
-Nwindow = 100  # sliding window size
+p = 0.5
+Nwindow = 200  # sliding window size
 y = np.zeros((Ndattotal, Nsig))
+psignals = []
+if signal_type == "ligo":
+    _psignals = []
+    for j in range(Ndattotal):
+        yn = np.random.randint(Nsig)
+        _psignals.append(signals[yn])
+        if y_init[yn]:
+            ybin.append([1, 0])
+        else:
+            ybin.append([0, 1])
+    psignals = spe.proc(_psignals)
 
-for j in range(Ndattotal):
-    yn = np.random.randint(Nsig)
-    if np.random.randn() < 0:
-        signal = signals[yn][0:-1:Nsamp]
-        ybin.append([1, 0])
-    else:
-        signal = signals[yn][0:-1:Nsamp] * 0
-        ybin.append([0, 1])
-    noise = ncoeff * np.random.randn(N)
-    for kk in range(Nsig):
-        y[j, kk] = int(yn == kk)  # turn to binary vector len n for n sig
-    rawsig = padrand(signal + noise, Npad, ncoeff)
+else:
+    for j in range(Ndattotal):
+        yn = np.random.randint(Nsig)
+        if np.random.rand() < p:
+            signal = signals[yn][0:-1:Nsamp]
+            ybin.append([1, 0])
+        else                     :
+            signal = signals[yn][0:-1:Nsamp] * 0
+            ybin.append([0, 1])
+        noise = ncoeff * np.random.randn(N)
+        for kk in range(Nsig):
+            y[j, kk] = int(yn == kk)  # turn to binary vector len n for n sig
+        psignals.append(padrand(signal + noise, Npad, ncoeff))
+
+for rawsig in psignals:
     slidez = slidend(rawsig / np.abs(rawsig).max(), Nwindow)
     threed = dimred3(slidez)
     xsig.append(rawsig.copy())
