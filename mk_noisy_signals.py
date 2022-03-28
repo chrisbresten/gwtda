@@ -21,7 +21,7 @@ except (IndexError, ValueError):
 
 
 def syntheticchirps():
-    """set of 4 locally periodic genetic wave packets fr testng and visualization"""
+    """set of 4 locally periodic genetic wave packets for testng and visualization"""
     N = 2000
     dx = np.linspace(-1, 1, N)
     signals = [
@@ -39,7 +39,7 @@ def syntheticchirps():
 
 
 def gwwhitenoise(Nsamp=Nsamp):
-    """loads up synthetic GW signals"""
+    """loads up synthetic GW signals made with surrogate model, noiseless"""
     synthetic_sigs = "datasample/data1samp.npy"
     global Nfactor
     Nfactor = 10 ** (-19)
@@ -47,7 +47,6 @@ def gwwhitenoise(Nsamp=Nsamp):
     Nsig = len(gw["signal_present"])
     signals = gw["data"]
     return signals
-
 
 if signal_type == "chirps":
     name = "chirps"
@@ -65,8 +64,7 @@ elif signal_type == "ligo":
     y_init = np.concatenate(tuple(gwpre[1]), 0)
     signals = np.concatenate(tuple(gwpre[0]), 0)
     spe = SpectralPerterbator()
-    spe.train(signals)
-    # signals = spe.proc(signals)
+    spe.train(signals,skip=y_init)
 else:
     Nsamp = 4
     ncoeff = 0.5
@@ -95,7 +93,7 @@ if signal_type == "ligo":
             ybin.append([1, 0])
         else:
             ybin.append([0, 1])
-    psignals = spe.proc(_psignals)
+    psignals = spe.proc(_psignals,ncoeff)
 
 else:
     for j in range(Ndattotal):
@@ -111,13 +109,13 @@ else:
             y[j, kk] = int(yn == kk)  # turn to binary vector len n for n sig
         psignals.append(padrand(signal + noise, Npad, ncoeff))
 
-for rawsig in psignals:
+for j,rawsig in enumerate(psignals):
     slidez = slidend(rawsig / np.abs(rawsig).max(), Nwindow)
     threed = dimred3(slidez)
     xsig.append(rawsig.copy())
     pcloud.append(threed.copy())
     if j % (int(Ndattotal / 100)) == 1:
-        print(int((100 * j) / Ndattotal))
+        print("%3d %" % (int((100 * j) / Ndattotal),),end='')
 
 
 outfile = "%s_signal_sliding_windowN%d_%d.npy" % (
