@@ -13,9 +13,9 @@ def chopsec(dat):
     """chops up time series into overlapping segments"""
     win = hz * wsec
     hw = int(win / 2)
-    N = len(dat)
-    start1 = np.arange(0, N - 1, win)
-    start2 = np.arange(hw, N - 2, win)
+    N = int(np.floor(len(dat)/win)*win)
+    start1 = np.arange(0, N , win)
+    start2 = np.arange(hw, N-hw, win)
     start = np.sort(list(start1) + list(start2))
     dataout = []
     for s in start:

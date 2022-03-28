@@ -4,24 +4,19 @@ import numpy as np
 
 # make synthetic soscillatory signals with additive whitenoise and padded with white noise
 # save the raw signals and the sliding window embedding dimensionally reduced to 3D
-Ndattotal = 4000
-Nsamp = 4  # downsample by this factor unless overwritten
+Ndattotal = 1000
+Nsamp = 1  # downsample by this factor unless overwritten
 Npad = 1000
-synthetic_sigs = "datasample/data1samp.npy"
 Nfactor = 1
-
+ncoeff = 0
 try:
     signal_type = sys.argv[1]
-except IndexError:
+    if len(sys.argv) > 2:
+        Ndattotal = int(sys.argv[2])
+except (IndexError,ValueError):
     SystemExit(
         f"Usage {sys.argv[0]} <signal type gw | chirps | ligo | whitenoise> <Ndata> \n whre (optional) Ndata is total elements to create"
     )
-
-if len(sys.argv) > 2:
-    try:
-        Ndattotal = int(sys.argv[2])
-    except:
-        Warning("marlformed command line arg")
 
 
 def syntheticchirps():
@@ -44,6 +39,7 @@ def syntheticchirps():
 
 def gwwhitenoise(Nsamp=Nsamp):
     """loads up synthetic GW signals"""
+    synthetic_sigs = "datasample/data1samp.npy"
     global Nfactor
     Nfactor = 10 ** (-19)
     gw = np.load(synthetic_sigs)
@@ -55,13 +51,22 @@ def gwwhitenoise(Nsamp=Nsamp):
 if signal_type == "chirps":
     name = "chirps"
     signals = syntheticchirps()
+    ncoeff = 0.5
 elif signal_type == "w":
     name = "whitenoise"
     gw = np.load(synthetic_sigs)
     signals = np.zeros(np.shape(gw["data"]))
+    ncoeff = 1
 elif signal_type == "ligo":
-    raise NotImplementedError
+    name = "ligo"
+    gwpre = np.load("datasample/segmentedLIGO2sec.npy", allow_pickle=True)
+    ncoeff = 0.05
+    y_init = np.concatenate(tuple(gwpre[1]), 0)
+    signals = np.concatenate(tuple(gwpre[0]), 0)
+    # freqs = np.fft.fft(signals)
 else:
+    Nsamp=4;
+    ncoeff = 0.5
     name = "gw"
     signals = gwwhitenoise()
 print(name)
@@ -77,7 +82,6 @@ k = 0
 Nwindow = 100  # sliding window size
 y = np.zeros((Ndattotal, Nsig))
 
-ncoeff = 0.5
 for j in range(Ndattotal):
     yn = np.random.randint(Nsig)
     if np.random.randn() < 0:
