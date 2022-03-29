@@ -2,8 +2,12 @@ import numpy as np
 
 # make synthetic soscillatory signals with additive whitenoise and padded with white noise
 # save the raw signals and the sliding window embedding dimensionally reduced to 3D
-def syntheticchirps(Npts=2000):
-    """set of 4 locally periodic genetic wave packets for testng and visualization. Nothing special, just generic items for example classification of wave packets. """
+
+
+def chirps(Npts=2000):
+    """set of 4 locally periodic genetic wave packets for testng and
+    visualization. Nothing special, just generic items for example
+    classification of wave packets."""
     dx = np.linspace(-1, 1, Npts)
     signals = [
         0 * dx,
@@ -19,13 +23,21 @@ def syntheticchirps(Npts=2000):
     return signals
 
 
-def gw_surroate(Nsamp=Nsamp):
-    """loads a saved sample of surrogate model(truncated fourier series) gravitational wave signatures from binary collisions. Generated with GWtools"""
+def gw_surroate():
+    """loads a saved sample of surrogate model(truncated fourier series)
+    gravitational wave signatures from binary collisions. Generated with
+    GWtools"""
     synthetic_sigs = "datasample/data1samp.npy"
     gw = np.load(synthetic_sigs)
     Nsig = len(gw["signal_present"])
-    signals = gw["data"]
-    return signals
+
+    _signals = gw["data"]
+    out = []
+    Nsamp = 4;
+    for s in _signals:
+        out.append(s[0:-1:Nsamp])
+    return out
+
 
 def ligo_events():
     """several identified ligo observations"""
@@ -35,9 +47,10 @@ def ligo_events():
 
     signals = np.concatenate(tuple(gwpre[0]), 0)
     out = []
-    for j,y in enumerate(y_init):
+    for j, y in enumerate(y_init):
         if y:
             out.append(signals[j])
-    return out 
+    return out
 
+legend = {"chirps": chirps, "gw": gw_surroate, "ligo": ligo_events}
 

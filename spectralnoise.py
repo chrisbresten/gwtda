@@ -3,12 +3,13 @@ import numpy as np
 
 class SpectralPerterb:  # haha
     def __init__(self, means=None, variace=None, N=None):
+        """can initialize with synthetic or saved state"""
         if means is not None and variance is not None:
             self.target_spectra_variance
-            self.target_spectra_mean = means
+            self.target_spectra_means = means
 
     def fit(self, signals, skip=None):
-        """calculates and saves the means and variances of the discrete cosine transform of the iterable object of input signals, skipping the elements where skip==True"""
+        """calculates and saves the means and variances of the discrete cosine transform coefficients of the iterable object of input signals, skipping the elements where skip==True"""
         N = len(signals[0])
         Nsig = len(signals)
         if skip is None:
