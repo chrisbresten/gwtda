@@ -216,8 +216,8 @@ class kernel_ref_transform:
         return SW
 
     def load_laplacian_geodesics(self, order=False):
-        Xl = np.loadtxt("laplacian/outX.txt")
-        Yl = np.loadtxt("laplacian/outY.txt")
+        Xl = np.loadtxt("datasample/referenceX.txt")
+        Yl = np.loadtxt("datasample/referenceY.txt")
         X_refs = []
         Npt = 1000
         NN = 300
