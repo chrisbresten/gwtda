@@ -129,15 +129,6 @@ def mkbothvec_alpha(data, Ntda, edgelen, Nint, epsmax=1):
     return (h0, h1, out0, out1)
 
 
-def padrand(V, n, kr):
-    """pads a signal white noise scaled by factor kr"""
-    cut = np.random.randint(n)
-    rand1 = np.random.randn(cut)
-    rand2 = np.random.randn(n - cut)
-    out = np.concatenate((rand1 * kr, V, rand2 * kr))
-    return out
-
-
 # sliding window functions and dimensional reduction
 ####################################################
 def slidend(dat, n):
