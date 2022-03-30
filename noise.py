@@ -37,7 +37,7 @@ def pad_white_noise(V, n, kr):
 
 
 sp = SpectralPerterb()
-noise = ligo_noise()
-sp.fit(noise)
+lnoise = ligo_noise()
+sp.fit(lnoise)
 
 legend = {"ligo": pad_ligo_noise, "white": pad_white_noise}

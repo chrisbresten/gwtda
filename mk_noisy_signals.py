@@ -21,16 +21,20 @@ except (IndexError, ValueError):
 
 try:
     signal_source_fun = signal_sources.legend[signal_type]
+except:
+    sigt = str(list(signal_sources.legend.keys()))
+    SystemExit(f"unknown signal type {signal_type} not in {sigt}")
+try:
     nfun = noise.legend[noise_type]
 except:
-    sigt = str(list(signals.legend.keys()))
-    SystemExit(f"unknown signal type {signal_type} not in {sigt}")
+    noiset = str(list(noise.legend.keys()))
+    SystemExit(f"unknown noise type {noise_type} not in {noiset}")
 
 signals = signal_source_fun()
 Nsig = len(signals)
 N = len(signals[0])
-ncoeff = 0.4 #coefficient that noise is scaled by
-p = 0.5 #proportion of elements with a signal present
+ncoeff = 0.4  # coefficient that noise is scaled by
+p = 0.5  # proportion of elements with a signal present
 Nwindow = 200  # sliding window size
 
 
@@ -60,7 +64,7 @@ for j, rawsig in enumerate(psignals):
     pcloud.append(threed.copy())
     if j % (int(Ndattotal / 100)) == 1:
         jj = int((100 * j) / Ndattotal)
-        print("%s   %s    " % (jj,'%'),end="\r")
+        print("%s   %s    " % (jj, "%"), end="\r")
 
 
 outfile = "%s_signal_sliding_windowN%d_%d.npy" % (
