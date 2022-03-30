@@ -15,20 +15,6 @@ except:
 uniquevilation = spsql.psycopg2.errors.UniqueViolation
 
 
-def serialize(x):
-    out = []
-    for k in x:
-        try:
-            if len(k) > 0:
-                out.append(serialize(list(k)))
-        except TypeError:
-            out.append(float(k))
-    return out
-
-
-# this serializes the weights, IE, puts them in a data type tat can be dumped to json.
-# the numpy numeric types are the culprit here
-
 
 class ModelLog:
     def __init__(self, model_json):

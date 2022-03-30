@@ -1,4 +1,9 @@
-import logrun
+from sklearn.metrics import roc_curve,auc
+from tools import serialize
+try:
+    import logrun
+except ModuleNotFoundError:
+    Warning("no database no logging/saving of results")
 import tensorflow as tf
 import numpy as np
 import sys
@@ -17,7 +22,6 @@ except IndexError:
     Npad,
     Ndattotal,
     ncoeff,
-    Nsamp,
     xsig,
     bettiout,
     pdout,
@@ -106,49 +110,25 @@ k = model.evaluate(x_test, y_test)
 print(k)
 
 
-yp = model.predict(x_test)
+ypred = model.predict(x_test)
 model_json = model.to_json()
 
+try:
+    logr = logrun.ModelLog(model_json)
+except:
+    Warning("Can't log model details")
 
-logr = logrun.ModelLog(model_json)
 
-
-# def mkroc(ytest, ypred):
-# y_pred_keras = keras_model.predict(X_test).ravel()
-ytest = y_test
-ypred = yp
-fpr_keras, tpr_keras, thresholds_keras = roc_curve(ytest.ravel(), ypred.ravel())
+fpr_keras, tpr_keras, thresholds_keras = roc_curve(y_test.ravel(), ypred.ravel())
 auc_keras = auc(fpr_keras, tpr_keras)
 nameout = (
-    "saveweights_"
+    "run_CNN_"
     + sys.argv[0].split(".")[0].strip(" ")
-    + "_WEIGHTS_"
     + str(Ndat)
     + embedi
     + "_"
     + str(np.random.randint(99999999))
     + ".npy"
-)
-
-np.save(
-    nameout,
-    (
-        fpr_keras,
-        tpr_keras,
-        auc_keras,
-        thresholds_keras,
-        Ndat,
-        Ntest,
-        ytest,
-        ypred,
-        x_test,
-        filename_original,
-        sys.argv[0],
-        ncoeff,
-        Rcoeflist,
-        model.get_config(),
-        model.get_weights(),
-    ),
 )
 
 
@@ -164,12 +144,34 @@ def serialize(x):
 
 
 weights = serialize(model.get_weights())
-logr.logrun(
-    k[1],
-    Ntest,
-    nameout,
-    sys.argv[1],
-    output={"auc_keras": auc_keras},
-    weights={"weights": weights},
-    notes="%s auc_keras: %f" % (str(k), auc_keras),
-)
+try:
+    logr.logrun(
+        k[1],
+        Ntest,
+        nameout,
+        sys.argv[1],
+        output={"auc_keras": auc_keras},
+        weights={"weights": weights},
+        notes="%s auc_keras: %f" % (str(k), auc_keras),
+    )
+except Exception as e:
+    Warning(f"Can't log results: {e} \n saving to file... {nameout}")
+    np.save(
+        nameout,
+        (
+            fpr_keras,
+            tpr_keras,
+            auc_keras,
+            thresholds_keras,
+            Ndat,
+            Ntest,
+            y_test,
+            ypred,
+            x_test,
+            filename_original,
+            sys.argv[0],
+            ncoeff,
+            model.get_config(),
+            model.get_weights(),
+        ),
+    )

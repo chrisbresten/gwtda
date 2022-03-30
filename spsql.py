@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import psycopg2
-from tenacity import retry, wait_random_exponential, stop_after_attempt
 
 load_dotenv('.env')
 
@@ -17,6 +16,7 @@ paramz["localhost"] = {
 
 
 class spsql:
+    """manages database connection, convenient"""
     def __init__(self, param="localhost", autocommit=True):
         self.autocommit = autocommit
         if type(param) == str:

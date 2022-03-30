@@ -9,30 +9,35 @@ def ligo_noise():
     signals = np.concatenate(tuple(gwpre[0]), 0)
     out = []
     for j, y in enumerate(y_init):
-        if not y:
+        if not y:  # if not signal-bearing window
             out.append(signals[j])
     return out
 
 
 def pad_ligo_noise(V, n, kr):
-    """adds kr*ligonoise to  V  and pads by random insertion into n points of ligo noise white noise
+    """adds kr*ligonoise to  V  and pads by random insertion into n points of ligo noise
     which is scaled by factor kr from mean 0 var 1 nominal distribution"""
     N = V.size
     cut = np.random.randint(n)
     randw = sp.synth(N + n)
-    out = np.concatenate((np.zeros(( cut,)), V, np.zeros(( n - cut,))))
-    return out + randw * kr
+    out = np.concatenate((np.zeros((cut,)), V, np.zeros((n - cut,))))
+    scale = np.ones(np.shape(out))
+    scale[0:cut] = 1 / kr
+    scale[(N + cut) : :] = 1 / kr
+    return out + randw * scale * kr
 
 
 def pad_white_noise(V, n, kr):
-    """adds kr*whitenoise to  V  and pads by random insertion into n points of white noise white noise
+    """adds kr*whitenoise to  V  and pads by random insertion into n points of white noise
     which is scaled by factor kr from mean 0 var 1 nominal distribution"""
+    N = V.size
     cut = np.random.randint(n)
-    rand1 = np.random.randn(cut)
-    rand2 = np.random.randn(n - cut)
-    randm = np.random.randn(V.size)
-    out = np.concatenate((rand1 * kr, V + kr * randm, rand2 * kr))
-    return out
+    randw = sp.synth_white(N + n)
+    out = np.concatenate((np.zeros((cut,)), V, np.zeros((n - cut,))))
+    scale = np.ones(np.shape(out))
+    scale[0:cut] = 1 / kr
+    scale[(N + cut) : :] = 1 / kr
+    return out + randw * scale * kr
 
 
 sp = SpectralPerterb()
