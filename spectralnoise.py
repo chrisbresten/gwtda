@@ -61,10 +61,11 @@ class SpectralPerterb:  # haha
         return (np.sqrt(n) / 2) * np.fft.irfft(
             np.random.normal(
                 np.ones(np.shape(self.target_spectra_means)) * mu,
-                np.ones(self.target_spectra_variance.real) * v,
+                np.ones(np.shape(self.target_spectra_variance.real)) * v,
             ),
             n=n,
         )
+
     def perterb_white(self, signal, c=0.05):
         """perterbs equivalently, only with white noise rather than the custom
         noise, but on the same scale"""
@@ -72,4 +73,3 @@ class SpectralPerterb:  # haha
         for j, o in enumerate(out):
             out[j] += self.synth_white(o.size) * c
         return out
-
