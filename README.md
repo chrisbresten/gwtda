@@ -11,7 +11,7 @@ spsql.py - code to manage database connection with some keep alive features
 sequence:
 ```
 python3 mk_noisy_signals.py gw
-python3 loadtda.py gw_*.npy 
+python3 calc_tda.py gw_*.npy 
 python3 run_CNN.py tda_*.py
 ```
 
