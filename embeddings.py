@@ -7,23 +7,24 @@ import gudhi.representations as tda
 ##############################
 
 
-def pdvec_alpha(data, Ntda, edgelen, Nint, epsmax=1):
-    epsvec = np.linspace(0, epsmax, Ntda)
-    digs, ints0, ints1 = gettree_int(data, edgelen=edgelen)
-    out1 = pdproc(ints1, Nint)
-    out0 = pdproc(ints0, Nint)
-    return (out0, out1)
-
-
-def pdvec(data, Ntda, edgelen, Nint, epsmax=1):
-    epsvec = np.linspace(0, epsmax, Ntda)
+def pdvec_alpha(data, Nint, epsmax=1):
+    """make persistence vector with the top Nint persistences using alpha complex"""
     digs, ints0, ints1 = gettree_int_alpha(data, edgelen=edgelen)
-    out1 = pdproc(ints1, Nint)
-    out0 = pdproc(ints0, Nint)
+    out1 = _pdproc(ints1, Nint)
+    out0 = _pdproc(ints0, Nint)
     return (out0, out1)
 
 
-def pdproc(dim1, Nint):  # sort proc the
+def pdvec(data, Nint, epsmax=1):
+    """make persistence vector with the top Nint persistences using rips complex"""
+    digs, ints0, ints1 = gettree_int(data, edgelen=edgelen)
+    out1 = _pdproc(ints1, Nint)
+    out0 = _pdproc(ints0, Nint)
+    return (out0, out1)
+
+
+def _pdproc(dim1, Nint):  # sort proc the
+    """internal helper function for persistence vectorcalculation"""
     out = np.zeros((len(dim1) + Nint,))
     k = 0
     for d in dim1:
@@ -41,17 +42,19 @@ def pdproc(dim1, Nint):  # sort proc the
 
 # betti vector
 ###############################
-def betti_vector_alpha(data, Ntda, edgelen):
+def betti_vector_alpha(data, Ntda, edgelen=1):
+    """make betti vector isong Ntda intervals  using sparse rips complex"""
+    epsvec = np.linspace(0, edgelen, Ntda)
     digs, ints0, ints1 = gettree_int_alpha(data, edgelen=edgelen)
     h0 = _betti_vector(digs, epsvec, 0)
     h1 = _betti_vector(digs, epsvec, 1)
-    return (h0, h1, out0, out1)
+    return (h0, h1)
 
 
-def betti_vector(data, Ntda, edgelen):
-    # edgelen = 3
+def betti_vector(data, Ntda, edgelen=1):
+    """make betti vector isong Ntda intervals using alpha complex"""
     epsvec = np.linspace(0, edgelen, Ntda)
-    digs = gettree(data, edgelen=edgelen)
+    digs, ints0, intsd1 = gettree_int(data, edgelen=edgelen)
     h0 = _betti_vector(digs, epsvec, 0)
     h1 = _betti_vector(digs, epsvec, 1)
     return (h0, h1)
@@ -82,7 +85,8 @@ def _input(x, tup):
 # get simplex treesssssss
 ###############################################
 def gettree_int(data, edgelen=100, maxdim=2):
-    """calculates simplex tree and persistence, returns persistence diagram and the intervals in H_0 and H_1"""
+    """calculates simplex tree and persistence, returns persistence diagram and
+    the intervals in H_0 and H_1"""
     rips = gd.RipsComplex(points=data, max_edge_length=edgelen, sparse=0.3)
     simplex_tree = rips.create_simplex_tree(max_dimension=maxdim)
     diag = simplex_tree.persistence(homology_coeff_field=2, min_persistence=0)
@@ -93,7 +97,8 @@ def gettree_int(data, edgelen=100, maxdim=2):
 
 
 def gettree_int_alpha(data, edgelen=100, maxdim=1):
-    """calculates simplex tree and persistence of alpha complex, returns persistence diagram and the intervals in H_0 and H_1"""
+    """calculates simplex tree and persistence of alpha complex, returns
+    persistence diagram and the intervals in H_0 and H_1"""
     rips = gd.AlphaComplex(points=data)  # ,sparse=0.3)
     simplex_tree = rips.create_simplex_tree(max_alpha_square=edgelen)
     diag = simplex_tree.persistence(homology_coeff_field=2, min_persistence=0)
@@ -108,22 +113,24 @@ def gettree_int_alpha(data, edgelen=100, maxdim=1):
 
 
 def mkbothvec(data, Ntda, edgelen, Nint):
-    """makes betti vector and persistence vector"""
+    """makes betti vector and persistence vector, using computational
+    redundance that would be wasted if the functions called separately"""
     epsvec = np.linspace(0, edgelen, Ntda)
     digs, ints0, ints1 = gettree_int(data, edgelen=edgelen)
-    out1 = pdproc(ints1, Nint)
-    out0 = pdproc(ints0, Nint)
+    out1 = _pdproc(ints1, Nint)
+    out0 = _pdproc(ints0, Nint)
     h0 = _betti_vector(digs, epsvec, 0)
     h1 = _betti_vector(digs, epsvec, 1)
     return (h0, h1, out0, out1)
 
 
-def mkbothvec_alpha(data, Ntda, edgelen, Nint, epsmax=1):
-    """makes betti vector and persistence vector alpha complex"""
-    epsvec = np.linspace(0, epsmax, Ntda)
+def mkbothvec_alpha(data, Ntda, edgelen, Nint):
+    """makes betti vector and persistence vector, using computational
+    redundance that would be wasted if the functions called separately, using alpha complex"""
+    epsvec = np.linspace(0, edgelen, Ntda)
     digs, ints0, ints1 = gettree_int_alpha(data, edgelen=edgelen)
-    out1 = pdproc(ints1, Nint)
-    out0 = pdproc(ints0, Nint)
+    out1 = _pdproc(ints1, Nint)
+    out0 = _pdproc(ints0, Nint)
     h0 = _betti_vector(digs, epsvec, 0)
     h1 = _betti_vector(digs, epsvec, 1)
     return (h0, h1, out0, out1)
@@ -131,21 +138,23 @@ def mkbothvec_alpha(data, Ntda, edgelen, Nint, epsmax=1):
 
 # sliding window functions and dimensional reduction
 ####################################################
-def slidend(dat, n):
-    """sliding window (data,n)  of indexable, enumerable vector/list/array "data", using window size n"""
-    N = len(dat)
+def slidend(data, n):
+    """sliding window (data,n)  of enumerable  vector/list/array "data", using window size n"""
+    N = len(data)
     cloud = []
     for j in range(N - n):
         c = []
         for i in range(n):
-            c.append(dat[j + i])
+            c.append(data[j + i])
         cloud.append(c)
     return np.matrix(cloud)
 
 
 def dimred(dat, Nsize, Svals=False, getV=False):
-    """perform PCA on the data, each element being a row, projecting onto dimension Nsize, optionally returning the singular  values, the right singular vectors V"""
-    # data element is each row
+    """perform PCA on the data, each element being a row, projecting onto
+    dimension Nsize, optionally returning the singular  values, the right
+    singular vectors V"""
+    # data elements are each row
     n = np.shape(dat)[1]
     for j in range(n):
         dat[:, j] = dat[:, j] - dat[:, j].mean()
@@ -162,7 +171,9 @@ def dimred(dat, Nsize, Svals=False, getV=False):
 
 
 def dimred3(dat):
-    """convenience function dimensionally reduce input data, each row being an element in some vector space, to dimension 3 using PCA calcualted by the SVD"""
+    """convenience function dimensionally reduce input data, each row being an
+    element in some vector space, to dimension 3 using PCA calcualted by the
+    SVD"""
     return dimred(dat, 3)
 
 
@@ -170,7 +181,10 @@ def dimred3(dat):
 #########################################
 
 
-class kernel_ref_transform:
+class sw_rep_embedding:
+    """computes a vector of kernelvalues with a set of reference
+    persistence diagrams and observed data using the sliced wasserstein
+    kernel"""
     def __init__(
         self,
         kernels_points=False,
@@ -193,9 +207,11 @@ class kernel_ref_transform:
         )
 
     def compute_reference_kerns(self, bandwidth=0.1, num_directions=10):
+        """prepare the sliced wasserstein kernels with their respective
+        reference PDs, using alpha compex"""
         SW = []
         for frame in self.kernels_points:
-            ac_ref = gd.AlphaComplex(points=frame).create_simplex_tree(
+            ac_ref = self.simplex(points=frame).create_simplex_tree(
                 max_alpha_square=np.sqrt(2)
             )
             ac_ref.persistence()
@@ -207,6 +223,7 @@ class kernel_ref_transform:
         return SW
 
     def load_laplacian_geodesics(self, order=False):
+        """load saved reference elements"""
         Xl = np.loadtxt("datasample/referenceX.txt")
         Yl = np.loadtxt("datasample/referenceY.txt")
         X_refs = []
@@ -231,10 +248,12 @@ class kernel_ref_transform:
         else:
             return X_refs[0 : self.Nrefs]
 
-    def project(self, pcloud):
-        # Initialization
+    def embed(self, pcloud):
+        """calculate alpha complex of pcloud and embed it in a vector space
+        formed by computing the sliced wasserstein kernel between its
+        persistence diagram and a set of precomputed refererences"""
         features = []
-        ac = gd.AlphaComplex(points=pcloud).create_simplex_tree(
+        ac = self.simplex(points=pcloud).create_simplex_tree(
             max_alpha_square=np.sqrt(2)
         )
         ac.persistence()

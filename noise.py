@@ -4,7 +4,6 @@ from spectralnoise import SpectralPerterb
 
 def ligo_noise():
     """noise from interferometer observtions"""
-    name = "ligo"
     gwpre = np.load("datasample/segmentedLIGO2sec.npy", allow_pickle=True)
     y_init = np.concatenate(tuple(gwpre[1]), 0)
     signals = np.concatenate(tuple(gwpre[0]), 0)
