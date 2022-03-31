@@ -62,9 +62,9 @@ for j, rawsig in enumerate(psignals):
     threed = dimred3(slidez)
     xsig.append(rawsig.copy())
     pcloud.append(threed.copy())
-    if j % (int(Ndattotal / 100)) == 1:
-        jj = int((100 * j) / Ndattotal)
-        print("%s   %s    " % (jj, "%"), end="\r")
+    if j % (int(Ndattotal / 100)) == 0:
+        jj = int((100 * (j / Ndattotal)))
+        print("  %s   %s    " % (jj, "%"), end="\r")
 
 
 outfile = "%s_signal_sliding_windowN%d_%d.npy" % (

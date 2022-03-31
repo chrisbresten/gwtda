@@ -14,30 +14,28 @@ def ligo_noise():
     return out
 
 
-def pad_ligo_noise(V, n, kr):
-    """adds kr*ligonoise to  V  and pads by random insertion into n points of ligo noise
-    which is scaled by factor kr from mean 0 var 1 nominal distribution"""
+def pad_ligo_noise(V, n, ncoef):
+    """adds ncoef*ligonoise to  V  and pads by random insertion into n points of ligo noise
+    which is scaled by factor ncoef from mean 0 var 1 nominal distribution"""
     N = V.size
-    cut = np.random.randint(n)
-    randw = sp.synth(N + n)
-    out = np.concatenate((np.zeros((cut,)), V, np.zeros((n - cut,))))
-    scale = np.ones(np.shape(out))
-    scale[0:cut] = 1 / kr
-    scale[(N + cut) : :] = 1 / kr
-    return out + randw * scale * kr
+    p = pad(V, n)
+    return sp.perterb(p, c=ncoef)
 
 
-def pad_white_noise(V, n, kr):
+def pad_white_noise(V, n, ncoef):
     """adds kr*whitenoise to  V  and pads by random insertion into n points of white noise
     which is scaled by factor kr from mean 0 var 1 nominal distribution"""
     N = V.size
-    cut = np.random.randint(n)
-    randw = sp.synth_white(N + n)
-    out = np.concatenate((np.zeros((cut,)), V, np.zeros((n - cut,))))
-    scale = np.ones(np.shape(out))
-    scale[0:cut] = 1 / kr
-    scale[(N + cut) : :] = 1 / kr
-    return out + randw * scale * kr
+    p = pad(V, n)
+    return sp.perterb_white(p, c=ncoef)
+
+
+def pad(signal, npad):
+
+    N = signal.size
+    cut = np.random.randint(npad)
+    out = np.concatenate((np.zeros((cut,)), signal, np.zeros((npad - cut,))))
+    return out
 
 
 sp = SpectralPerterb()

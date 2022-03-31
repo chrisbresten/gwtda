@@ -1,29 +1,7 @@
+from tools import savestuff
 import sys
 import numpy as np
 import embeddings
-
-
-def savestuff(end=False):
-    if end:
-        part = ""
-    else:
-        part = "_part"
-    np.save(
-        outfile + part,
-        (
-            loadfile,
-            Npad,
-            Ndattotal,
-            ncoeff,
-            xsig,
-            bettiout,
-            pdout,
-            swout,
-            yout,
-        ),
-    ) 
-    print("\n save %s percent" % (100 * int(j / N),))
-
 
 try:
     loadfile = sys.argv[1]
@@ -62,4 +40,6 @@ for j, pp in enumerate(pcloud):
     yout.append(y[j])
     if (j > 1) and (j % int(Ndattotal / 10) == 0):
         savestuff()
+        print("\n save %s percent" % (int(100 * j / N),))
 savestuff(True)
+
