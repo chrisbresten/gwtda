@@ -41,5 +41,5 @@ for j, pp in enumerate(pcloud):
     if (j > 1) and (j % int(Ndattotal / 10) == 0):
         savestuff()
         print("\n save %s percent" % (int(100 * j / N),))
-savestuff(True)
+savetda(True)
 

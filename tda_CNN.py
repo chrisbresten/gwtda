@@ -28,30 +28,27 @@ x_test = x[(Ndat - Ntest + 1) : :]
 y_train = y[0 : Ndat - Ntest]
 y_test = y[Ndat - Ntest + 1 : :]
 daN = len(x[0])
+
 model = tf.keras.models.Sequential(
     [
-        tf.keras.layers.Conv1D(daN / 8, kernel_size=8, strides=1, input_shape=(daN, 1)),
-        tf.keras.layers.MaxPooling1D(pool_size=16, strides=4, padding="valid"),
-        tf.keras.layers.Conv1D(64, kernel_size=8, strides=1, input_shape=(daN, 1)),
-        tf.keras.layers.MaxPooling1D(
-            pool_size=4, strides=4, padding="valid"
-        ),  # data_format='channels_last'),
-        tf.keras.layers.Conv1D(32, kernel_size=3, strides=1, input_shape=(daN, 1)),
+        tf.keras.layers.Conv1D(32, kernel_size=32, strides=1, input_shape=(daN, 1)),
         tf.keras.layers.MaxPooling1D(pool_size=4, strides=4, padding="valid"),
         tf.keras.layers.Dense(32, activation=tf.nn.relu),
         tf.keras.layers.Conv1D(64, kernel_size=3),
-        tf.keras.layers.MaxPooling1D(
-            pool_size=4, strides=4, padding="valid"
-        ),  # data_format='channels_last'),
+        tf.keras.layers.MaxPooling1D(pool_size=4, strides=4, padding="valid"),
+        tf.keras.layers.Dense(32, activation=tf.nn.relu),
+        tf.keras.layers.Conv1D(64, kernel_size=8),
+        tf.keras.layers.MaxPooling1D(pool_size=4, strides=4, padding="valid"),
         tf.keras.layers.Dense(64, activation=tf.nn.relu),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(64),  # activation=tf.nn.linear),
+        tf.keras.layers.Dense(64),
         tf.keras.layers.Dense(64, activation=tf.nn.relu),
-        tf.keras.layers.Dense(32),  # activation=tf.nn.linear),
+        tf.keras.layers.Dense(32),
         tf.keras.layers.Dense(32, activation=tf.nn.relu),
-        tf.keras.layers.Dense(2),  # ,activation=tf.nn.softmax)
+        tf.keras.layers.Dense(2),
     ]
 )
+
 model.compile(loss="mean_squared_error", optimizer="adam", metrics=["accuracy"])
 
 model.fit(x_train, y_train, epochs=5)

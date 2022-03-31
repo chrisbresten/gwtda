@@ -50,15 +50,15 @@ def savestuff(end=False):
     np.save(
         __main__.outfile + part,
         (
-            ___main__.loadfile,
-            ___main__.Npad,
-            ___main__.Ndattotal,
-            ___main__.ncoeff,
-            ___main__.xsig,
-            ___main__.bettiout,
-            ___main__.pdout,
-            ___main__.swout,
-            ___main__.yout,
+            __main__.loadfile,
+            __main__.Npad,
+            __main__.Ndattotal,
+            __main__.ncoeff,
+            __main__.xsig,
+            __main__.bettiout,
+            __main__.pdout,
+            __main__.swout,
+            __main__.yout,
         ),
     )
 
@@ -72,3 +72,63 @@ def plot_signals(filen, show=True):
             plt.plot(k, "r")
     if show:
         plt.show()
+
+
+def prep4Classifier(loadfile, embedi):
+    modes = ["pd", "sw", "bv", "all"]
+    """prepares the data for classification, input is file and embedding type, output is embedded signals and raw signals"""
+    (
+        filename_original,
+        Npad,
+        Ndattotal,
+        ncoeff,
+        xsig,
+        bettiout,
+        pdout,
+        swout,
+        yout,
+    ) = np.load(loadfile, allow_pickle=True)
+    y = []
+    signals = []  # time domain raw signal
+    xembed = []  # embeddings
+    xconcat = []  # combined
+    if embedi == "pd":
+        daN = 100
+    else:
+        daN = 50
+    Ndat = len(yout)
+    maxsig = 0.0
+    for xn in xsig:
+        maxsig = max(maxsig, np.abs(xn).max())
+    for j in range(Ndat):
+        if embedi == modes[0]:  # pd
+            b = pdout[j]
+            xx = np.reshape(np.array(list(b[0]) + list(b[1])), (daN, 1))
+        elif embedi == modes[1]:  # sw
+            b = np.array(swout[j])
+            daN = b.size
+            xx = np.reshape(b, (daN, 1))
+        elif embedi == modes[2]:  # bv
+            b = bettiout[j]
+            xx = np.reshape(np.array(list(b[0]) + list(b[1])), (daN, 1))
+        elif embedi == modes[3]:  # all
+            b = np.array(
+                list(pdout[j][0])
+                + list(pdout[j][1])
+                + list(swout[j])
+                + list(bettiout[j][0])
+                + list(bettiout[j][1])
+            )
+            daN = b.size
+            xx = np.reshape(b, (daN, 1))
+        signals.append(np.reshape(xsig[j] / maxsig, (len(xsig[j]), 1)))
+        # raw normalized signal
+        xembed.append(xx / xx.max())
+        y.append(yout[j])
+        xconcat.append(
+            np.concatenate(
+                ((xx / xx.max()), np.reshape(xsig[j] / maxsig, (len(xsig[j]), 1)))
+            )
+        )
+        # embedding
+    return (np.array(xconcat), np.array(y), np.array(signals), np.array(xembed))
