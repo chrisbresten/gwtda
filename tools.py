@@ -42,7 +42,7 @@ def snr_whitenoise(signal, signal_with_noise, R, length=1):
     return match_filter_snr
 
 
-def savestuff(end=False):
+def savetda(end=False):
     if end:
         part = ""
     else:

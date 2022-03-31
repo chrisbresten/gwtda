@@ -14,9 +14,11 @@ try:
     noise_type = sys.argv[2]
     if len(sys.argv) > 3:
         Ndattotal = int(sys.argv[3])
+    if len(sys.argv)>4:
+        ncoeff = float(sys.argv[4])
 except (IndexError, ValueError):
     SystemExit(
-        f"Usage {sys.argv[0]} <signal type gw | chirps | ligo > <noise ligo | whitenoise> <Ndata> \n whre (optional) Ndata is total elements to  create"
+        f"Usage {sys.argv[0]} <signal type gw | chirps | ligo > <noise ligo | whitenoise> <Ndata> <ncoeff>\n where (optional) Ndata and ncoeff are the total elements to  create"
     )
 
 try:
@@ -33,7 +35,7 @@ except:
 signals = signal_source_fun()
 Nsig = len(signals)
 N = len(signals[0])
-ncoeff = 0.4  # coefficient that noise is scaled by
+ncoeff = 0.3  # coefficient that noise is scaled by
 p = 0.5  # proportion of elements with a signal present
 Nwindow = 200  # sliding window size
 
@@ -64,7 +66,7 @@ for j, rawsig in enumerate(psignals):
     pcloud.append(threed.copy())
     if j % (int(Ndattotal / 100)) == 0:
         jj = int((100 * (j / Ndattotal)))
-        print("  %s   %s    " % (jj, "%"), end="\r")
+        print("  %s   %s  %d/%d  " % (jj, "%",j,Ndattotal), end="\r")
 
 
 outfile = "%s_signal_sliding_windowN%d_%d.npy" % (
