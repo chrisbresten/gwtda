@@ -25,23 +25,6 @@ def serialize(x):
     return out
 
 
-def snr_whitenoise(signal, signal_with_noise, R, length=1):
-    WaveformLength = length
-    dt = WaveformLength / len(signal)
-    freqs, hFreq = gwutils.freqDomainWaveform(signal, dt)
-    freqs_noise, nFreq = gwutils.freqDomainWaveform(signal_with_noise, dt)
-    df = 1 / WaveformLength
-    noise_std = R
-    Sn = 2.0 * dt * (noise_std ** 2.0) / WaveformLength
-    numerator = np.real(
-        mismatch.inner_complex(hFreq, nFreq, psd=Sn, df=df, ligo=True, pos_freq=False)
-    )
-    denominator = np.sqrt(
-        mismatch.inner(hFreq, hFreq, psd=Sn, df=df, ligo=True, pos_freq=False)
-    )
-    match_filter_snr = numerator / denominator
-    return match_filter_snr
-
 
 def savetda(end=False):
     if end:

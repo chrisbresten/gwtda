@@ -64,7 +64,7 @@ class ModelLog:
         cmdline_args = ""
         for a in _cmdline_args:
             cmdline_args = cmdline_args + " " + a
-
+        print(self.modelhash)
         self.s.curs.execute(
             "insert into "
             + SCHEMA
