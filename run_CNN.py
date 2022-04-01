@@ -1,3 +1,5 @@
+"""run from command like run_CNN.py datafile_tda_features.npy <embedding> \n where <embedding> is one of{modes} @author Chris Brsten"""
+
 from tools import prep4Classifier
 from sklearn.metrics import roc_curve, auc
 from tools import serialize

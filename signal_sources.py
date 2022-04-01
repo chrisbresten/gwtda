@@ -1,8 +1,5 @@
 import numpy as np
 
-# make synthetic soscillatory signals with additive whitenoise and padded with white noise
-# save the raw signals and the sliding window embedding dimensionally reduced to 3D
-
 
 def chirps(Npts=2000):
     """set of 4 locally periodic genetic wave packets for testng and
@@ -33,7 +30,7 @@ def gw_surroate():
 
     _signals = gw["data"]
     out = []
-    Nsamp = 4;
+    Nsamp = 2;
     for s in _signals:
         out.append(s[0:-1:Nsamp])
     return out

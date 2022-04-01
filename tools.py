@@ -1,3 +1,4 @@
+import tensorflow as tf
 import __main__
 import numpy as np
 from matplotlib import pyplot as plt
@@ -132,3 +133,31 @@ def prep4Classifier(loadfile, embedi):
         )
         # embedding
     return (np.array(xconcat), np.array(y), np.array(signals), np.array(xembed))
+
+
+def loadfromjson(CONFIGJSON, serialweights):
+    """loads a sequential model from json as string or dict, with accomidation
+    for various user ineptitudes with regards to the need for consistent input
+    types and data structure.  returns tensorflow model"""
+    if type(CONFIGJSON) == str:
+        _json_cfg = json.loads(CONFIGJSON)
+    else:  # if type(CONFIGJSON)==dict:
+        _json_cfg = CONFIGJSON
+    try:
+        json_cfg = _json_cfg["config"]
+    except KeyError:
+        json_cfg = _json_cfg
+    try:
+        model = tf.keras.models.Sequential.from_config(json_cfg)
+    except:
+        print(json_cfg)
+        raise
+    theshapes = []
+    for l in model.layers:
+        for w in l.weights:
+            theshapes.append(tuple(w.shape.as_list()))
+    theweights = []
+    for j, s in enumerate(serialweights):
+        theweights.append(np.reshape(s, theshapes[j]))
+    model.set_weights(theweights)
+    return model

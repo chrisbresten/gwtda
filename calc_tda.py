@@ -24,7 +24,7 @@ Ksw = embeddings.sw_rep_embedding(Nrefs=50)
     Nsig,
     sigind,
 ) = np.load(loadfile, allow_pickle=True)
-outfile = "tda_" + loadfile.split('.')[0] + str(np.random.randint(10000))
+outfile = "tda_" + loadfile.rstrip(".npy") + str(np.random.randint(10000))
 bettiout = []
 pdout = []
 swout = []
@@ -38,8 +38,7 @@ for j, pp in enumerate(pcloud):
     pdout.append((pd0, pd1))
     swout.append(kSWlap)
     yout.append(y[j])
-    if (j % int(Ndattotal / 10) == 0):
+    if j % int(Ndattotal / 10) == 0:
         savetda()
         print("\n save %s percent" % (int(100 * j / N),))
 savetda(True)
-

@@ -5,7 +5,7 @@ class SpectralPerterb:  # haha
     def __init__(self, means=None, variace=None, N=None):
         """can initialize with synthetic or saved state"""
         if means is not None and variance is not None:
-            self.target_spectra_variance
+            self.target_spectra_std
             self.target_spectra_means = means
 
     def fit(self, signals, skip=None):
@@ -23,7 +23,7 @@ class SpectralPerterb:  # haha
             if not skip[j]:
                 H[j, :] = (2 / np.sqrt(N)) * np.fft.rfft(s).real
         self.target_spectra_means = np.mean(H, 1)
-        self.target_spectra_variance = np.sqrt(np.var(H, 1)) * np.sqrt(Nsig)
+        self.target_spectra_std = np.sqrt(np.var(H, 1)) * np.sqrt(Nsig)
         self.N = N
         self.H = H
         self.Nsig = Nsig
@@ -32,7 +32,7 @@ class SpectralPerterb:  # haha
         """perterbs the fourier coefficients of an iterable list/array/tupple
         of signals(as numpy arrays) proportional to c with random samples from
         a normal distribution for each fourier coefficient with the mean and
-        variance in self.target_spectra_variance and self.target_spectra_mean.
+        variance in self.target_spectra_std and self.target_spectra_mean.
         It is a statistically-speaking, a unitary operation"""
         out = signal.copy() * (1 - c)
         for j, o in enumerate(out):
@@ -47,7 +47,7 @@ class SpectralPerterb:  # haha
         return (np.sqrt(n) / 2) * np.fft.irfft(
             np.random.normal(
                 self.target_spectra_means.real,
-                self.target_spectra_variance.real,
+                self.target_spectra_std.real,
             ),
             n=n,
         )
@@ -57,11 +57,11 @@ class SpectralPerterb:  # haha
         if n is None:
             n = self.N
         mu = np.mean(self.target_spectra_means.real)
-        v = self.target_spectra_variance.real.mean()
+        v = self.target_spectra_std.real.mean()
         return (np.sqrt(n) / 2) * np.fft.irfft(
             np.random.normal(
                 np.ones(np.shape(self.target_spectra_means)) * mu,
-                np.ones(np.shape(self.target_spectra_variance.real)) * v,
+                np.ones(np.shape(self.target_spectra_std.real)) * v,
             ),
             n=n,
         )

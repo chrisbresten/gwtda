@@ -1,19 +1,40 @@
-database.sql - schema to init the postgres(maybe works on other) sql database
-embeddings.py - module to do TDA embeddings
-example.env - example .env file
-loadtda.py - load up signals and do sliding window and TDA stuff
-logrun.py - module to save tensorflow runs
-mk_noisy_signals.py - expand data by adding noise and shifting position
-run_CNN.py - run CNN
-spsql.py - code to manage database connection with some keep alive features
+
+calc_tda.py
+database.sql
+dotda.sh
+embeddings.py - embeddings of persistence diagrams
+noise.py - noise helpers
+run_CNN.py - hybrid CNN tda feature scheme
+signal_sources.py - convenience code to load data sources
+spectralnoise.py - 
+spsql.py - helper function for postgres connection magnagement(overkill for this))
+tda_CNN.py - CNN on only TDA features
+tools.py - misc helpers and io stuff
+
+
+
+
 
 
 sequence:
 ```
-python3 mk_noisy_signals.py gw
+python3 mk_noisy_signals.py gw white 2000 
 python3 calc_tda.py gw_*.npy 
 python3 run_CNN.py tda_*.py
 ```
+
+
+
+Storing results
+===============
+
+logruns.py interacts with a somewhat sophisticated system for saving and organizing results and code run with a postgres backend. This is optional and will not block code execution if broken
+
+it saves every model architecture, weights, test results, and code that made them, in a postgresql schema. This is done automatically so if the code is edited, it will autpmatiocally update a table, adding a row for a new model. 
+
+There are 2 tables, one for models and one for runs of them. rows are added to the model table when the system sees a new model being used. the weights and results of every run, along with identifiers to the model that made them are stored in the runs table. .
+
+
 
 
 
