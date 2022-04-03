@@ -28,7 +28,8 @@ class SpectralPerterb:  # haha
             if not skip[j]:
                 H[j, :] = (2 / np.sqrt(N)) * np.fft.rfft(s).real
         self.target_spectra_means = np.mean(H, 0)
-        self.target_spectra_std = np.sqrt(np.var(H, 0)) * np.sqrt(Nsig)
+        self.target_spectra_std = np.std(H, 0)
+        self.target_spectra_var = (np.sqrt(Nsig))*np.var(H, 0)
         self.N = N
         self.H = H
         self.Nsig = Nsig
@@ -87,7 +88,8 @@ class SpectralPerterb:  # haha
         freqs, hFreq = gwutils.freqDomainWaveform(signal, dt)
         freqs_noise, nFreq = gwutils.freqDomainWaveform(signal_with_noise, dt)
         df = 1 / WaveformLength
-        Sn =  np.pad(self.target_spectra_std** 2.0,(0,N-len(self.target_spectra_std)),mode='symmetric')
+        
+        Sn =  np.pad(self.target_spectra_var,(0,N-len(self.target_spectra_var)),mode='symmetric')
         numerator = np.real(
             mismatch.inner_complex(hFreq, nFreq, psd=Sn, df=df, ligo=True, pos_freq=False)
         )

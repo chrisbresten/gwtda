@@ -1,3 +1,8 @@
+"""Usage {sys.argv[0]} <signal type gw | chirps | ligo > <noise ligo | whitenoise> <Ndata = 1000> <ncoeff>\n where (optional) Ndata and ncoeff are the total elements to  create
+
+ligo noise is spectrally perterbed noise from ligo data absent of events.
+"""
+
 import signal_sources
 import noise
 
@@ -18,7 +23,7 @@ try:
         ncoeff = float(sys.argv[4])
 except (IndexError, ValueError):
     SystemExit(
-        f"Usage {sys.argv[0]} <signal type gw | chirps | ligo > <noise ligo | whitenoise> <Ndata> <ncoeff>\n where (optional) Ndata and ncoeff are the total elements to  create"
+        f"Usage {sys.argv[0]} <signal type gw | chirps | ligo > <noise ligo | whitenoise> <Ndata = 1000> <ncoeff>\n where (optional) Ndata and ncoeff are the total elements to  create"
     )
 
 try:
