@@ -15,7 +15,6 @@ except:
 uniquevilation = spsql.psycopg2.errors.UniqueViolation
 
 
-
 class ModelLog:
     def __init__(self, model_json):
         if type(model_json) == dict:
@@ -59,16 +58,19 @@ class ModelLog:
             output = json.dumps(output)
         if type(weights) == dict:
             weights = json.dumps(weights)
+            weightshash = hashlib.md5(weights.encode("utf-8")).hexdigest()
+        else:
+            weightshash = hashlib.md5((output + params).encode("utf-8")).hexdigest()
         # automatically get the cmdline args from the code at
         _cmdline_args = __main__.sys.argv
         cmdline_args = ""
         for a in _cmdline_args:
             cmdline_args = cmdline_args + " " + a
-        print(self.modelhash)
+        print(f"weightshash:{weightshash}")
         self.s.curs.execute(
             "insert into "
             + SCHEMA
-            + ".runs (cmdline_args, test_accuracy,test_size, savefile, loadfile,filehash, modelhash,gitinfo,notes, outputs, params,weights) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            + ".runs (cmdline_args, test_accuracy,test_size, savefile, loadfile,filehash, modelhash,gitinfo,notes, outputs, params,weights,weightshash) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (
                 cmdline_args,
                 accuracy,
@@ -82,8 +84,10 @@ class ModelLog:
                 output,
                 params,
                 weights,
+                weightshash,
             ),
         )
+        print(f"modelhash:{self.modelhash}")
 
     # pull info about the state of the git repo
     @property

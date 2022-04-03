@@ -6,3 +6,6 @@ create table gwcnn.runs (time_inserted timestamp default now(), id serial primar
 create index on gwcnn.runs using btree(test_accuracy);
 create index on gwcnn.runs using gin(to_tsvector('simple',cmdline_args));
 create index on gwcnn.models using btree(modelhash);
+alter table gwcnn.runs add column weightshash char(32);
+alter table gwcnn.runs add constraint weights_uniq unique(weightshash);
+
