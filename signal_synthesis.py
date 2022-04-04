@@ -19,7 +19,7 @@ try:
     noise_type = sys.argv[2]
     if len(sys.argv) > 3:
         Ndattotal = int(sys.argv[3])
-    if len(sys.argv)>4:
+    if len(sys.argv) > 4:
         ncoeff = float(sys.argv[4])
 except (IndexError, ValueError):
     SystemExit(
@@ -46,6 +46,7 @@ Nwindow = 200  # sliding window size
 
 
 y = np.zeros((Ndattotal, Nsig))
+pre_psignals = []
 psignals = []
 x = []
 xsig = []
@@ -62,7 +63,9 @@ for j in range(Ndattotal):
         ybin.append([0, 1])
     for kk in range(Nsig):
         y[j, kk] = int(yn == kk)  # turn to binary vector len n for n sig
-    psignals.append(nfun(signal, Npad, ncoeff))
+    pre_psignals.append(signal)
+psignals = nfun(pre_psignals, ncoeff)
+
 
 for j, rawsig in enumerate(psignals):
     slidez = slidend(rawsig / np.abs(rawsig).max(), Nwindow)
@@ -71,7 +74,7 @@ for j, rawsig in enumerate(psignals):
     pcloud.append(threed.copy())
     if j % (int(Ndattotal / 100)) == 0:
         jj = int((100 * (j / Ndattotal)))
-        print("  %s   %s  %d/%d  " % (jj, "%",j,Ndattotal), end="\r")
+        print("  %s   %s  %d/%d  " % (jj, "%", j, Ndattotal), end="\r")
 
 
 outfile = "%s_signals_%d_%d.npy" % (

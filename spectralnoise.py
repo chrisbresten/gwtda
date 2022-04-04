@@ -41,6 +41,8 @@ class SpectralPerterb:  # haha
         std in self.target_spectra_std and self.target_spectra_mean.
         It is a statistically-speaking, a unitary operation"""
         out = []
+        if signals[0].size == 1:
+            signals = [signals]
         for s in signals:
             out.append(
                 np.sqrt(self.N)
@@ -59,6 +61,8 @@ class SpectralPerterb:  # haha
         a normal distribution for each fourier coefficient with the mean and
         std in self.target_spectra_std and self.target_spectra_mean.
         It is a statistically-speaking, a unitary operation"""
+        if signals[0].size == 1:
+            signals = [signals]
         out = []
         for s in signals:
             out.append(
@@ -67,7 +71,7 @@ class SpectralPerterb:  # haha
                     (1 / np.sqrt(self.N))
                     * np.fft.rfft(s)
                     * np.random.normal(
-                        1, (c*np.mean(self.stds) / 2), int(self.N / 2 + 1)
+                        1, (c * np.mean(self.stds) / 2), int(self.N / 2 + 1)
                     )
                 )
             )
