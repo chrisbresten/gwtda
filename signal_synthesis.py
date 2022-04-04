@@ -74,7 +74,7 @@ for j, rawsig in enumerate(psignals):
         print("  %s   %s  %d/%d  " % (jj, "%",j,Ndattotal), end="\r")
 
 
-outfile = "%s_signal_sliding_windowN%d_%d.npy" % (
+outfile = "%s_signals_%d_%d.npy" % (
     signal_type + "_" + noise_type + "_" + str(ncoeff),
     Ndattotal,
     np.random.randint(5, 5000),

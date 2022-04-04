@@ -26,6 +26,11 @@ s.curs.execute(
 
 _weights = s.curs.fetchall()
 (modelhash, savefile, loadfile, weights, cmdline_args) = _weights[0]
+s.curs.execute(
+    "select model_json from " + SCHEMA + ".models where modelhash=%s", (modelhash,)
+)
+_model_json = s.curs.fetchall()[0][0]
+
 print(savefile, "  -  ", loadfile, "  -  ", cmdline_args)
 print(np.array(weights["weights"][0]).shape)
 print(np.ravel(weights["weights"][0]).shape)
@@ -38,10 +43,20 @@ else:
 (a, c, b) = np.array(weights["weights"][0]).shape
 convweights = np.array(weights["weights"][0])
 
+
+def loadactiv(model_json, weights):
+    if type(weights) is dict:
+        weightsa = np.array(weights["weights"])
+    model = loadfromjson(model_json, weightsa)
+    model.compile()
+    # returns array of functions
+    return [model.layers[j].activation for j in range(len(model.layers))]
+
+
 def mkplot(JK):
     ze = np.reshape(xem[JK], (xem[JK].size,))
     re = ze.copy()
-    re[(ze==0)]=1
+    re[(ze == 0)] = 1
     csum = np.convolve(ze, convweights[:, 0, 0], mode="valid")
     j = 1
     print(xema)
@@ -51,17 +66,14 @@ def mkplot(JK):
             print(convweights[:, 0, j])
         c = np.convolve(ze, convweights[:, 0, j], mode="valid")
         csum = csum + c
-        img.append(c/(re[2::]))
+        img.append(c / (re[2::]))
     plt.figure()
-    aimg = np.array(img).reshape(len(img),len(img[0]))
+    aimg = np.array(img).reshape(len(img), len(img[0]))
     plt.imshow(np.log(np.abs(img) + 0.000001))
     return ze
 
 
-
-
-
-ze=[]
+ze = []
 for K in range(5):
     ze.append(mkplot(K))
 plt.figure()

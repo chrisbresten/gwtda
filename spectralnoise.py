@@ -45,11 +45,9 @@ class SpectralPerterb:  # haha
             out.append(
                 np.sqrt(self.N)
                 * np.fft.irfft(
-                    (1 / np.sqrt(self.N))
-                    * np.fft.rfft(s)
+                    (np.sqrt(2) / np.sqrt(self.N))
                     * np.random.normal(
-                        np.ones(np.shape(self.means)),
-                        (self.stds * (c / 2)),
+                        np.fft.rfft(s).real, (self.stds * (c / 2)), int(self.N / 2) + 1
                     )
                 )
             )
@@ -68,7 +66,9 @@ class SpectralPerterb:  # haha
                 * np.fft.irfft(
                     (1 / np.sqrt(self.N))
                     * np.fft.rfft(s)
-                    * np.random.normal(1, c / 2, int(self.N / 2 + 1))
+                    * np.random.normal(
+                        1, (c*np.mean(self.stds) / 2), int(self.N / 2 + 1)
+                    )
                 )
             )
         return out
