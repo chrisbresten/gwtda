@@ -8,7 +8,6 @@ from sklearn.metrics import auc
 import tensorflow as tf
 import numpy as np
 
-# import matplotlib.pyplot as plt
 import sys
 import spsql
 
@@ -16,7 +15,6 @@ s = spsql.spsql()
 
 SCHEMA = os.getenv("SCHEMA", "gw")
 
-# s.curs.execute("select modelhash, savefile,loadfile, weights,cmdline_args from " + SCHEMA + ".runs order by test_accuracy desc limit 100")
 s.curs.execute(
     "select modelhash, savefile,loadfile, weights,cmdline_args from "
     + SCHEMA

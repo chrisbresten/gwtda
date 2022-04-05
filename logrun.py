@@ -16,7 +16,9 @@ uniquevilation = spsql.psycopg2.errors.UniqueViolation
 
 
 class ModelLog:
+    """this is a utility for logging results from tensorflow AI pipelines under development. it automatically stores some helpful information such as git log info, the code run, hashes of important things to index results by"""
     def __init__(self, model_json):
+        """initialize with json dump of the model from tensorflow, can be dict or string"""
         if type(model_json) == dict:
             self.model_json = json.dumps(model_json)
         else:
@@ -52,6 +54,7 @@ class ModelLog:
         output=dict(),
         weights=dict(),
     ):
+        """logs the results from running a neural network or other classifier. params, output, weights are taken as python dictionaries or json, and stored as json natively in postgres. accuracy is a float that you may want to store so  you can sort things easily by it, presumably it is a performance metric such as classification accuracy. savefile and loadfile are places you can store any filesystem sources of data for outputs and inputs respectively"""
         if type(params) == dict:
             params = json.dumps(params)
         if type(output) == dict:
@@ -91,6 +94,7 @@ class ModelLog:
 
     # pull info about the state of the git repo
     @property
+    """pulls git versioning info git log --raw --max-count=1"""
     def gitstuff(self):
         try:
             sh = os.popen("git log --raw --max-count=1")

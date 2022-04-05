@@ -58,7 +58,7 @@ class SpectralPerterb:  # haha
 
     def synth(self, n=None, means=None, stds=None):
         """outputs a inverse-fft reconstructed signal randomly from the known
-        means and stds, specified length defeaulting to training length"""
+        means and stds(of the fourier coefficients calculated as 2*np.fft.rfft.real), specified length defeaulting to training length"""
         if means is None:
             means = self.means
         if stds is None:
@@ -82,7 +82,7 @@ class SpectralPerterb:  # haha
         )
 
     def snr(self, signal, signal_with_noise, freq=4096):
-        """calculate snr of resulting signal based off of noise statistics used to generate it"""
+        """calculate snr of resulting signal based off of noise statistics used to generate it. by default assumes the frequency is 4096hz so be aware of that. """
         N = len(signal)
         dt = 1 / freq
         WaveformLength = dt * N
