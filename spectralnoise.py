@@ -27,7 +27,7 @@ class SpectralPerterb:  # haha
         H = np.zeros((Nsig, int(N / 2 + 1)))
         for j, s in enumerate(signals):
             if not skip[j]:
-                H[j, :] = np.fft.rfft(s)
+                H[j, :] = 2*np.fft.rfft(s).real
         self.means = np.mean(H, 0)
         self.stds = np.std(H, 0)
         self.N = N

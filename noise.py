@@ -46,10 +46,13 @@ def chop(signal, nchop):
 
 def fit(Nchop):
     lnoise = ligo_noise()
-    clnoise = []
-    for l in lnoise:
-        clnoise.append(chop(l, Nchop))
-    sp.fit(clnoise)
+    if Nchop > 0:
+        clnoise = []
+        for l in lnoise:
+            clnoise.append(chop(l, Nchop))
+        sp.fit(clnoise)
+    else:
+        sp.fit(lnoise)
 
 
 legend = {"ligo": chop_ligo_noise, "white": chop_white_noise}
