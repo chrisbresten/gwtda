@@ -15,7 +15,7 @@ Ksw = embeddings.sw_rep_embedding(Nrefs=50)
     xsig,
     y,
     pcloud,
-    Npad,
+    Nchop,
     ncoeff,
     Nwindow,
     Ndattotal,
