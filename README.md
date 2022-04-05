@@ -1,36 +1,51 @@
 
-calc_tda.py
-database.sql
-dotda.sh
-embeddings.py - embeddings of persistence diagrams
-noise.py - noise helpers
-run_CNN.py - hybrid CNN tda feature scheme
-signal_sources.py - convenience code to load data sources
-spectralnoise.py - 
-spsql.py - helper function for postgres connection magnagement(overkill for this))
-tda_CNN.py - CNN on only TDA features
-tools.py - misc helpers and io stuff
+
+
+
+userspace code:
+- `calc_tda.py` : generate the persistence and embedding thereof
+- `viz_con.py` : visualization of activation and convolution
+- `tda_CNN.py` : CNN classifier for TDA embedded features
+- `run_CNN.py` : classifier with CNN on raw data and TDA embedded features combined
+- `signal_synthesis.py` : synthesis of GW signals from signal sources and noise sources, and construction of sliding window embedding
+
+
+library-like code:
+- `spectralnoise.py` : generates noise of observed PSD 
+- `embeddings.py` : library for TDA embeddings
+- `logrun.py` : utility to log results in postgres database for easy access for imaging
+
+interfaces, convenience:
+- `ligoprep.py` : utility used to segment ligo data
+- `signal_sources.py` : interface to conveniently access a few different signal sources
+- `noise.py` : interface to access noise sources and use them
+- `spsql.py` : utility for managing postgres connections, overkill for this sort of application but convenient for me. originally made for keep-alive features in more robust back-end applications
+- `tools.py` : misc helper functions
 
 
 
 
 
 
-sequence:
+userspace launch sequence:
 ```
-python3 mk_noisy_signals.py gw white 2000 
+python3 signal_synthesis.py ligo ligo 2000 
 python3 calc_tda.py gw_*.npy 
 python3 run_CNN.py tda_*.py
 ```
 
 
 
+
+
+
+
 Storing results
 ===============
 
-logruns.py interacts with a somewhat sophisticated system for saving and organizing results and code run with a postgres backend. This is optional and will not block code execution if broken
+logrun.py interacts with a somewhat sophisticated system for saving and organizing results and code run with a postgres backend. This is optional and will not block code execution if broken
 
-it saves every model architecture, weights, test results, and code that made them, in a postgresql schema. This is done automatically so if the code is edited, it will autpmatiocally update a table, adding a row for a new model. 
+it saves every model architecture, weights, test results, and code that made them, in a postgresql schema. This is done automatically so if the code is edited, it will automatically update a table, adding a row for a new model. 
 
 There are 2 tables, one for models and one for runs of them. rows are added to the model table when the system sees a new model being used. the weights and results of every run, along with identifiers to the model that made them are stored in the runs table. .
 
@@ -42,7 +57,9 @@ There are 2 tables, one for models and one for runs of them. rows are added to t
 
 install postgres
 ================
-setting up the database from scratch. it is not hard, only thing is the auth, which can be a little weird
+this is for reference to people who dont ever use databases
+
+setting up the database from scratch. it is not hard, only thing is the auth, which can be a little weird if you are not used to databases. 
 
 ```
 sudo apt install postgresql-12
@@ -64,7 +81,7 @@ to `/etc/postgresql/12/main/pg_hba.conf`, then do `psql -U postgres` and
 ```postgres=# \password 
 Enter new password: 
 ```
-you need ot set the password to access it throguh psycopg, for the command line client it can do a trust based auth locally through a pipe, fifo,  emulated filesystem object thing
+you need to set the password to access it through psycopg, for the command line client it can do a trust based auth locally through a pipe, fifo,  emulated filesystem object thing. keep in mind that postgres is the admin account...
 
 init the schema
 ```
@@ -73,4 +90,4 @@ cat database.sql|psql -U postgres
 ```
 
 
-put the auth info into the fine `.env`
+put the auth info into the flne `.env`
