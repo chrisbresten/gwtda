@@ -14,27 +14,28 @@ def ligo_noise():
     return out
 
 
-def pad_ligo_noise(V, n, ncoef):
-    """adds ncoef*ligonoise to  V  and pads by random insertion into n points
+def chop_ligo_noise(V, n, ncoef):
+    """adds ncoef*ligonoise to  V  and chops by random insertion into n points
     of noise, partially synthetic by random perterbation selective spetrally to
     the data as observed"""
-    #p = pad(V, n)
+    p = chop(V, n)
     return sp.perterb(p, c=ncoef)
 
 
-def pad_white_noise(V, n, ncoef):
-    """adds kr*whitenoise to  V  and pads by random insertion into n points of white noise
+def chop_white_noise(V, n, ncoef):
+    """adds kr*whitenoise to  V  and chops by random insertion into n points of white noise
     which is scaled by factor kr from mean 0 var 1 nominal distribution"""
-    #p = pad(V, n)
+    p = chop(V, n)
     return sp.perterb_white(p, c=ncoef)
 
 
-def pad(signal, npad):
-    raise Warning("Padding time domain disabled temporarily")
-    # N = signal.size
-    ##cut = np.random.randint(npad)
-    # out = np.concatenate((np.zeros((cut,)), signal, np.zeros((npad - cut,))))
-    return signal
+def chop(signal, nchop):
+    """chops out a fixed size random position portion to use, providing
+    variable position without artifacts and difficulties  and discontinuities
+    of padding"""
+    N = signal.size
+    cut = np.random.randint(nchop)
+    return signal[cut : (nchop - cut)]
 
 
 sp = SpectralPerterb()

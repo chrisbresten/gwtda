@@ -27,7 +27,7 @@ class SpectralPerterb:  # haha
         H = np.zeros((Nsig, int(N / 2 + 1)))
         for j, s in enumerate(signals):
             if not skip[j]:
-                H[j, :] = (1 / np.sqrt(N)) * np.fft.rfft(s)
+                H[j, :] = np.fft.rfft(s)
         self.means = np.mean(H, 0)
         self.stds = np.std(H, 0)
         self.N = N
@@ -41,18 +41,8 @@ class SpectralPerterb:  # haha
         std in self.target_spectra_std and self.target_spectra_mean.
         It is a statistically-speaking, a unitary operation"""
         out = []
-        if signals[0].size == 1:
-            signals = [signals]
         for s in signals:
-            out.append(
-                np.sqrt(self.N)
-                * np.fft.irfft(
-                    (np.sqrt(2) / np.sqrt(self.N))
-                    * np.random.normal(
-                        np.fft.rfft(s).real, (self.stds * (c / 2)), int(self.N / 2) + 1
-                    )
-                )
-            )
+            out.append(s * (1 - c) + self.synth() * c)
         return out
 
     def perterb_white(self, signals, c=0.05):
@@ -61,20 +51,9 @@ class SpectralPerterb:  # haha
         a normal distribution for each fourier coefficient with the mean and
         std in self.target_spectra_std and self.target_spectra_mean.
         It is a statistically-speaking, a unitary operation"""
-        if signals[0].size == 1:
-            signals = [signals]
         out = []
         for s in signals:
-            out.append(
-                np.sqrt(self.N)
-                * np.fft.irfft(
-                    (1 / np.sqrt(self.N))
-                    * np.fft.rfft(s)
-                    * np.random.normal(
-                        1, (c * np.mean(self.stds) / 2), int(self.N / 2 + 1)
-                    )
-                )
-            )
+            out.append(s * (1 - c) + self.synth_white() * c)
         return out
 
     def synth(self, n=None, means=None, stds=None):
@@ -87,7 +66,7 @@ class SpectralPerterb:  # haha
 
         if n is None:
             n = self.N
-        return (np.sqrt(n)) * np.fft.irfft(
+        return np.fft.irfft(
             np.random.normal(
                 means,
                 stds,
@@ -111,7 +90,7 @@ class SpectralPerterb:  # haha
         freqs_noise, nFreq = gwutils.freqDomainWaveform(signal_with_noise, dt)
         df = 1 / WaveformLength
         Sn = np.pad(
-            (np.sqrt(N)) * self.stds ** 2.0,
+            1/(np.sqrt(self.N))*self.stds ** 2.0,
             (0, N - len(self.stds)),
             mode="symmetric",
         )
