@@ -35,7 +35,7 @@ def savetda(end=False):
         __main__.outfile + part,
         (
             __main__.loadfile,
-            __main__.Npad,
+            __main__.Nchop,
             __main__.Ndattotal,
             __main__.ncoeff,
             __main__.xsig,
@@ -63,7 +63,7 @@ def prep4Classifier(loadfile, embedi):
     """prepares the data for classification, input is file and embedding type, output is embedded signals and raw signals"""
     (
         filename_original,
-        Npad,
+        Nchop,
         Ndattotal,
         ncoeff,
         xsig,

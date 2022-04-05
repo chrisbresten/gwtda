@@ -11,9 +11,10 @@ from embeddings import slidend, dimred3
 import numpy as np
 
 Ndattotal = 1000
-Npad = 1000
+Nchop = 512
 Nfactor = 1
 ncoeff = 0
+noise.fit(512)
 try:
     signal_type = sys.argv[1]
     noise_type = sys.argv[2]
@@ -64,7 +65,7 @@ for j in range(Ndattotal):
     for kk in range(Nsig):
         y[j, kk] = int(yn == kk)  # turn to binary vector len n for n sig
     pre_psignals.append(signal)
-psignals = nfun(pre_psignals, ncoeff)
+psignals = nfun(pre_psignals,Nchop, ncoeff)
 
 
 for j, rawsig in enumerate(psignals):
@@ -84,5 +85,5 @@ outfile = "%s_signals_%d_%d.npy" % (
 )
 np.save(
     outfile,
-    (xsig, ybin, pcloud, Npad, ncoeff, Nwindow, Ndattotal, N, signals, Nsig, y),
+    (xsig, ybin, pcloud, Nchop, ncoeff, Nwindow, Ndattotal, N, signals, Nsig, y),
 )

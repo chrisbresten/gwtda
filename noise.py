@@ -1,6 +1,8 @@
 import numpy as np
 from spectralnoise import SpectralPerterb
 
+sp = SpectralPerterb()
+
 
 def ligo_noise():
     """noise from interferometer observtions"""
@@ -18,28 +20,36 @@ def chop_ligo_noise(V, n, ncoef):
     """adds ncoef*ligonoise to  V  and chops by random insertion into n points
     of noise, partially synthetic by random perterbation selective spetrally to
     the data as observed"""
-    p = chop(V, n)
-    return sp.perterb(p, c=ncoef)
+    out = []
+    for s in V:
+        out.append(chop(s, n))
+    return sp.perterb(out, c=ncoef)
 
 
 def chop_white_noise(V, n, ncoef):
     """adds kr*whitenoise to  V  and chops by random insertion into n points of white noise
     which is scaled by factor kr from mean 0 var 1 nominal distribution"""
-    p = chop(V, n)
-    return sp.perterb_white(p, c=ncoef)
+    out = []
+    for s in V:
+        out.append(chop(s, n))
+    return sp.perterb_white(out, c=ncoef)
 
 
 def chop(signal, nchop):
     """chops out a fixed size random position portion to use, providing
     variable position without artifacts and difficulties  and discontinuities
     of padding"""
-    N = signal.size
+    N = len(signal)
     cut = np.random.randint(nchop)
-    return signal[cut : (nchop - cut)]
+    return signal[cut : (N - nchop + cut)]
 
 
-sp = SpectralPerterb()
-lnoise = ligo_noise()
-sp.fit(lnoise)
+def fit(Nchop):
+    lnoise = ligo_noise()
+    clnoise = []
+    for l in lnoise:
+        clnoise.append(chop(l, Nchop))
+    sp.fit(clnoise)
 
-legend = {"ligo": sp.perterb, "white": sp.perterb_white}
+
+legend = {"ligo": chop_ligo_noise, "white": chop_white_noise}
