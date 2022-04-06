@@ -1,3 +1,4 @@
+import sys
 from tools import serialize, loadfromjson, prep4Classifier, getmodel
 import matplotlib.pyplot as plt
 import json
@@ -6,18 +7,16 @@ import os
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 import tensorflow as tf
-import numpy as np
-
-try:
-    model, loadfile, cmdline_args = getmodel(sys.argv[1])
-except:
-    model, loadfile, cmdline_args = getmodel()
+annot=''
+randint = np.random.randint
+weightshash = sys.argv[1].rstrip(" ")
+model, loadfile, cmdline_args = getmodel(weightshash)
 weights = model.get_weights()
 embedtype = cmdline_args.split(" ")[-1]
 (x, y, xsig, xema) = prep4Classifier(loadfile, embedtype)
 if "run_CNN" in cmdline_args:
     xem = x
-    #print(x.shape)
+    # print(x.shape)
     raw = 1
 else:
     raw = 0
@@ -32,9 +31,6 @@ def loadactiv(model, layer):
     return model.layers[layer].call
 
 
-if embedtype == "all":
-    vlines = [50, 100, 150, 200, 175]
-
 comment = [
     "p vector H_0",
     "p vector H_1",
@@ -43,21 +39,22 @@ comment = [
     "betti-vector h1",
 ]
 
-
-elif embedtype == "pd":
+vlines = [50, 100, 150, 175, 200]
+if embedtype == "pd":
     vlines = [50]
-    comment=[ "p vector H_0",    "p vector H_1"]
+    comment = ["p vector H_0", "p vector H_1"]
 elif embedtype == "bv":
     vlines = [25]
-    comment =["betti-vector h0",    "betti-vector h1"]
+    comment = ["betti-vector h0", "betti-vector h1"]
 
-    
+
 if raw == 1:
     #    vlines = list(vlines)  + [np.sum(vlines)]
     comment = comment + ["raw signal"]
 
 
 def mkplot(JK):
+    global annot
     fig = plt.figure()
     ax1 = plt.subplot(311)
     ax2 = plt.subplot(312)
@@ -81,13 +78,13 @@ def mkplot(JK):
         )
         # imgact.append(act0(img[-1]))
     aimg = np.array(img).reshape(len(img), len(img[0]))
-    ax1.imshow(np.log10(np.abs(imgno) + 0.000000001))
+    ax1.imshow(np.log10(np.abs(imgno) + 0.000000001),aspect='auto')
     if y[JK][0] == 1:
         plt.title("signal present")
     else:
         plt.title("no signal")
     ax1.annotate(
-        "normalized to input max, log",
+        "normalized to input, log",
         xy=(0, 0),
         xytext=(12, -12),
         rotation=0,
@@ -95,25 +92,30 @@ def mkplot(JK):
         annotation_clip=False,
     )
 
-    ax2.imshow(img)
+    ax2.imshow(np.log10(np.abs(np.array(img))+0.000000001),aspect='auto')
 
     ax2.annotate(
-        "raw output",
+        "log(abs(output+\eps))",
         xy=(0, 0),
         xytext=(12, -12),
         rotation=0,
         va="center",
         annotation_clip=False,
     )
-
-    ax2.set(xlim=[0, ze.size])
-    ax1.set(xlim=[0, ze.size])
+    if raw==1 and sys.argv[2]=='zoom':
+        slim=512
+        annot='zoom'
+    else:
+        slim = ze.size
+        annot='full'
+    ax2.set(xlim=[0, slim])
+    ax1.set(xlim=[0, slim])
     # ax2.plot(act0(ze))
-    ax3.set(xlim=[0, ze.size])
+    ax3.set(xlim=[0, slim])
     ax3.plot(ze)
     for v in range(len(vlines)):
-        ax1.axvline(vlines[v] - 2, color="red")
-        ax2.axvline(vlines[v] - 2, color="red")
+        ax1.axvline(vlines[v] - convN+1, color="red")
+        ax2.axvline(vlines[v] - convN, color="red")
         ax3.axvline(vlines[v], color="red")
         ax3.annotate(
             comment[v],
@@ -126,8 +128,8 @@ def mkplot(JK):
             annotation_clip=False,
             # arrowprops=arrowprops,
         )
-        plt.tight_layout()
-    if raw == 1 or embedtype !='all':
+        #plt.tight_layout()
+    if raw == 1 or embedtype != "all":
         ax3.annotate(
             comment[-1],
             xy=(vlines[-1] + 2, 0),
@@ -141,19 +143,36 @@ def mkplot(JK):
         )
 
 
+print(embedtype)
 ze = []
 ysig = 0
 nosig = 0
 K = 0
+N = len(y)
+np.random.seed(5321)
 while ysig < 2 or nosig < 2:
-    K = K + 1
-    if y[K][1] == 1 and ysig < 2:
+    K = randint(N)
+    if y[K][0] == 1 and ysig < 2:
         ysig = ysig + 1
         mkplot(K)
-        print(K)
-    if y[K][0] == 0 and nosig < 2:
+        sig = "sig"
+    if y[K][1] == 1 and nosig < 2:
         nosig = nosig + 1
         mkplot(K)
+        sig = "nosig"
 
-
-plt.show()
+    plt.savefig(
+        "figs/"
+        + loadfile[0:20]
+        + "N"
+        + str(N)
+        + sig
+        + str(K)
+        + embedtype
+        + str(raw)
+        + str(annot)
+        + ".eps"
+    )
+    if len(sys.argv)>3:
+        plt.show()
+    plt.close()

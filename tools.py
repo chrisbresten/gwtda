@@ -182,19 +182,20 @@ def loadfromjson(CONFIGJSON, serialweights):
     return model
 
 
-def getmodel(**kwargs):
-    """searches for the latest entry from table of runs where kwarg=value, if
-    nothing specified, finds most recent entry chronologically"""
-    if len(kwargs) == 0:
-        value = 1
-        field = 1
-    else:
-        field = kwargs.keys()[0]
-        value = kwargs.values()[0]
+def getlastN(N):
+    s.curs.execute(
+        "select weightshash from " + f"{SCHEMA}.runs order by id desc limit %s",
+        (N,),
+    )
+    _weightsH = s.curs.fetchall()
+    return np.ravel(_weightsH)
+
+
+def getmodel(weightshash):
     s.curs.execute(
         "select modelhash, weights, cmdline_args,loadfile from "
-        + f"{SCHEMA}.runs where {field}=%s order by id desc limit 1",
-        (value,),
+        + f"{SCHEMA}.runs where weightshash=%s order by id desc limit 1",
+        (weightshash.lower(),),
     )
     _weights = s.curs.fetchall()
     (modelhash, weights, cmdline_args, loadfile) = _weights[0]
