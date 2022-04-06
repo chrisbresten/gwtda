@@ -1,26 +1,31 @@
 
+GWTDA 0.0.1
++++++++++++
+===========
+
+This is not software intended for endusers. This is at most the begining of TDA time series classification module, or something of that natre.
 
 
 
-userspace code:
-- `calc_tda.py` : generate the persistence and embedding thereof
+userspace code, these are more scripts/examples of things being done:
+- `signal_synthesis.py` : synthesis of GW signals from signal sources and noise sources, and construction of sliding window embedding
+- `calc_tda.py` : generate the persistence diagrams of time series and store embedding thereof
 - `viz_con.py` : visualization of activation and convolution
 - `tda_CNN.py` : CNN classifier for TDA embedded features
 - `run_CNN.py` : classifier with CNN on raw data and TDA embedded features combined
-- `signal_synthesis.py` : synthesis of GW signals from signal sources and noise sources, and construction of sliding window embedding
 
 
-library-like code:
-- `spectralnoise.py` : generates noise of observed PSD 
-- `embeddings.py` : library for TDA embeddings
-- `logrun.py` : utility to log results in postgres database for easy access for imaging
+library-like code that does interesting and potentially useful things, in coherent organized form:
+- `spectralnoise.py` : generates noise of observed PSD for synthesis and colored perterbation of 
+- `embeddings.py` : persistence diagram vector space embeddings, sliding window embedding
+- `logrun.py` : utility to log tensorflow results in postgres database for easy access for imaging
 
-interfaces, convenience:
+interfaces, convenience, generic hacks in this codebase:
 - `ligoprep.py` : utility used to segment ligo data
 - `signal_sources.py` : interface to conveniently access a few different signal sources
 - `noise.py` : interface to access noise sources and use them
 - `spsql.py` : utility for managing postgres connections, overkill for this sort of application but convenient for me. originally made for keep-alive features in more robust back-end applications
-- `tools.py` : misc helper functions
+- `tools.py` : misc helper functions and hacks
 
 
 
@@ -39,11 +44,12 @@ python3 run_CNN.py tda_*.py
 
 
 
-
 Storing results
 ===============
 
-logrun.py interacts with a somewhat sophisticated system for saving and organizing results and code run with a postgres backend. This is optional and will not block code execution if broken
+logrun.py interacts with a somewhat sophisticated system for saving and organizing results and code run with a postgres backend. This is meant to be optional and will not block execution of classifiers if broken. 
+
+This is a utility designed for people hand tweaking tensorflow models, to keep track of every tensorflow model that is trained and tested, without the need for extra user input at runtime.  
 
 it saves every model architecture, weights, test results, and code that made them, in a postgresql schema. This is done automatically so if the code is edited, it will automatically update a table, adding a row for a new model. 
 
