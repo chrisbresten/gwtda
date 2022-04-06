@@ -10,10 +10,10 @@ import sys
 from embeddings import slidend, dimred3
 import numpy as np
 
+ncoeff = 0.3  # coefficient that noise is scaled by
 Ndattotal = 1000
 Nchop = 512
 Nfactor = 1
-ncoeff = 0
 noise.fit(512)
 try:
     signal_type = sys.argv[1]
@@ -41,11 +41,10 @@ except:
 signals = signal_source_fun()
 Nsig = len(signals)
 N = len(signals[0])
-ncoeff = 0.3  # coefficient that noise is scaled by
 p = 0.5  # proportion of elements with a signal present
 Nwindow = 200  # sliding window size
 
-
+print(ncoeff)
 y = np.zeros((Ndattotal, Nsig))
 pre_psignals = []
 psignals = []

@@ -2,6 +2,15 @@ import tensorflow as tf
 import __main__
 import numpy as np
 from matplotlib import pyplot as plt
+from spsql import spsql
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+s = spsql()
+SCHEMA = os.getenv("SCHEMA", "gw")
 
 try:
     from gwtools import mismatch
@@ -23,7 +32,6 @@ def serialize(x):
         except TypeError:
             out.append(float(k))
     return out
-
 
 
 def savetda(end=False):
@@ -59,7 +67,7 @@ def plot_signals(filen, show=True):
 
 
 def prep4Classifier(loadfile, embedi):
-    modes = ["pd", "sw", "bv", "all"]
+    modes = ["pd", "sw", "bv", "all", "bv1", "bv2", "pd1", "pd2"]
     """prepares the data for classification, input is file and embedding type, output is embedded signals and raw signals"""
     (
         filename_original,
@@ -93,9 +101,11 @@ def prep4Classifier(loadfile, embedi):
             daN = b.size
             xx = np.reshape(b, (daN, 1))
         elif embedi == modes[2]:  # bv
+            bettiout[j][0][0] = 0
             b = bettiout[j]
             xx = np.reshape(np.array(list(b[0]) + list(b[1])), (daN, 1))
         elif embedi == modes[3]:  # all
+            bettiout[j][0][0] = 0
             b = np.array(
                 list(pdout[j][0])
                 + list(pdout[j][1])
@@ -103,6 +113,24 @@ def prep4Classifier(loadfile, embedi):
                 + list(bettiout[j][0])
                 + list(bettiout[j][1])
             )
+            daN = b.size
+            xx = np.reshape(b, (daN, 1))
+        elif embedi == modes[4]:  # bv
+            bettiout[j][0][0] = 0
+            b = np.array(bettiout[j][0])
+            daN = b.size
+            xx = np.reshape(np.array(b), (daN, 1))
+        elif embedi == modes[5]:  # bv
+            bettiout[j][0][0] = 0
+            b = np.array(bettiout[j][1])
+            daN = b.size
+            xx = np.reshape(np.array(b), (daN, 1))
+        if embedi == modes[6]:  # pd
+            b = np.array(pdout[j][0])
+            daN = b.size
+            xx = np.reshape(b, (daN, 1))
+        if embedi == modes[7]:  # pd
+            b = np.array(pdout[j][1])
             daN = b.size
             xx = np.reshape(b, (daN, 1))
         signals.append(np.reshape(xsig[j] / maxsig, (len(xsig[j]), 1)))
@@ -116,6 +144,14 @@ def prep4Classifier(loadfile, embedi):
         )
         # embedding
     return (np.array(xconcat), np.array(y), np.array(signals), np.array(xembed))
+
+
+def loadmodel(model_json, weights):
+    if type(weights) is dict:
+        weightsa = np.array(weights["weights"])
+    model = loadfromjson(model_json, weightsa)
+    model.compile()
+    return model
 
 
 def loadfromjson(CONFIGJSON, serialweights):
@@ -144,3 +180,26 @@ def loadfromjson(CONFIGJSON, serialweights):
         theweights.append(np.reshape(s, theshapes[j]))
     model.set_weights(theweights)
     return model
+
+
+def getmodel(**kwargs):
+    """searches for the latest entry from table of runs where kwarg=value, if
+    nothing specified, finds most recent entry chronologically"""
+    if len(kwargs) == 0:
+        value = 1
+        field = 1
+    else:
+        field = kwargs.keys()[0]
+        value = kwargs.values()[0]
+    s.curs.execute(
+        "select modelhash, weights, cmdline_args,loadfile from "
+        + f"{SCHEMA}.runs where {field}=%s order by id desc limit 1",
+        (value,),
+    )
+    _weights = s.curs.fetchall()
+    (modelhash, weights, cmdline_args, loadfile) = _weights[0]
+    s.curs.execute(
+        "select model_json from " + SCHEMA + ".models where modelhash=%s", (modelhash,)
+    )
+    _model_json = s.curs.fetchall()[0][0]
+    return loadmodel(_model_json, weights), loadfile, cmdline_args

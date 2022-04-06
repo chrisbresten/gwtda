@@ -32,7 +32,7 @@ y_test = y[Ndat - Ntest + 1 : :]
 daN = len(x[0])
 model = tf.keras.models.Sequential(
     [
-        tf.keras.layers.Conv1D(128, kernel_size=8, strides=1, input_shape=(daN, 1)),
+        tf.keras.layers.Conv1D(512, kernel_size=8, strides=1, input_shape=(daN, 1)),
         tf.keras.layers.MaxPooling1D(pool_size=16, strides=4, padding="valid"),
         tf.keras.layers.Conv1D(64, kernel_size=8, strides=1, input_shape=(daN, 1)),
         tf.keras.layers.MaxPooling1D(
