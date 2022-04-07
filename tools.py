@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from spsql import spsql
 import os
 from dotenv import load_dotenv
-
+from termcolor import colored
 load_dotenv()
 
 
@@ -17,6 +17,22 @@ try:
     from gwtools import gwutils
 except:
     print("gwtools not installed, cant calculate SNR")
+
+
+def tp(bo):
+    """simpole decorator for handling test function in unit tests. input function ust return bool"""
+    def testcolor(bo):
+        try:
+            if bo():
+                print(colored('pass','green'))
+            else:
+                print(colored('FAIL CONDITION','red'),colored(bo.__name__,'red'),colored(bo.__code__.co_names[-5::],'red'))
+        except Exception as e:
+            print(colored('ACTUAL FAIL','red'), e,colored(bo.__name__,'red'),colored(bo.__code__.co_names[-5::],'orange'))
+        return lambda : 1
+    return testcolor(bo)
+
+
 
 
 def serialize(x):
