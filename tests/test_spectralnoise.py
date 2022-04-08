@@ -4,6 +4,8 @@ import spectralnoise
 import numpy as np
 
 norm = np.linalg.norm
+
+
 @tp
 def test_mag():
     g = spectralnoise.SpectralPerterb()
@@ -17,15 +19,26 @@ import signal_sources
 
 g = spectralnoise.SpectralPerterb()
 l = np.array(noise.ligo_noise())
-cl = signal_sources.ligo_events()
+cl = signal_sources.ligo_events().copy()
 g.fit(l)
 
 @tp
 def test_mag__perterb(): 
     ln = g.perterb(cl, c=0.5)
     lnl = g.perterb(cl, c=0.05)
-    #lg = g.perterb_white(l, c=0.5)
-    #c = g.perterb(cl, c=0.5)
+    lg = g.perterb_white(l, c=0.5)
+    clp = g.perterb(cl, c=0.5)
+    print(norm(lg))
+    clp = g.perterb(cl, c=0.5)
+    print(norm(clp))
+    clp = g.perterb(cl, c=0.5)
+    print(norm(clp))
+    clp = g.perterb(cl, c=0.5)
+    print(norm(clp))
+    clp = g.perterb(cl, c=0.5)
+    print(norm(clp))
+
+    print(norm(ln))
     rm =  norm(ln)/norm(lnl) 
     return rm < 1.4 and rm > 0.9
 @tp

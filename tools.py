@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from termcolor import colored
 load_dotenv()
 
+import inspect 
+
 
 s = spsql()
 SCHEMA = os.getenv("SCHEMA", "gw")
@@ -26,9 +28,9 @@ def tp(bo):
             if bo():
                 print(colored('pass','green'))
             else:
-                print(colored('FAIL CONDITION','red'),colored(bo.__name__,'red'),colored(bo.__code__.co_names[-5::],'red'))
+                print(colored('FAIL CONDITION','red'),colored(bo.__name__,'magenta'),colored(bo.__code__.co_names[-5::],'red'),colored(inspect.getsource(bo).split("\n")[-2::],'yellow'))
         except Exception as e:
-            print(colored('ACTUAL FAIL','red'), e,colored(bo.__name__,'red'),colored(bo.__code__.co_names[-5::],'orange'))
+            print(colored('ACTUAL FAIL','red'), e,colored(bo.__name__,'red'),colored(bo.__code__.co_names[-5::],'red'))
         return lambda : 1
     return testcolor(bo)
 
