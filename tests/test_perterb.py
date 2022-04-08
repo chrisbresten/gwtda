@@ -9,11 +9,11 @@ noise.fit(0)
 sig = sigs[0]
 sign = []
 
-for k in range(10):
+for k in range(2):
     print(norm(sigs[k]))
-    for j in range(9):
-        sign = noise.sp.perterb(sigs,c=0.1*j)
+    for j in range(4):
+        sign = noise.sp.perterb(sigs,c=0.1)
         print(noise.sp.snr(sigs[k],sign[k]))
-        print(norm(sign[k]))
+#        print(norm(sign[k]))
         plt.plot(sign[k])
 plt.show()
