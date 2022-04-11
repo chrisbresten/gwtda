@@ -1,6 +1,12 @@
 import numpy as np
 import gudhi as gd
 import gudhi.representations as tda
+from dotenv import load_dotenv
+import psycopg2
+
+load_dotenv(".env")
+
+VERBOSE = os.getenv("VERBOSE").lower.strip(" ") in ["t", "true", "1", "y", "yes"]
 
 
 # persistence vector
@@ -159,6 +165,8 @@ def dimred(dat, Nsize, Svals=False, getV=False):
     for j in range(n):
         dat[:, j] = dat[:, j] - dat[:, j].mean()
     [U, S, V] = np.linalg.svd(dat, full_matrices=False)
+    if VERBOSE:
+        print("VERBOSE", S[0:10])
     op = np.matrix(V[0:Nsize, :])
     if not Svals and not getV:
         return dat * op.T
@@ -185,6 +193,7 @@ class sw_rep_embedding:
     """computes a vector of kernelvalues with a set of reference
     persistence diagrams and observed data using the sliced wasserstein
     kernel"""
+
     def __init__(
         self,
         kernels_points=False,
