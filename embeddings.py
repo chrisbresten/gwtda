@@ -3,10 +3,10 @@ import gudhi as gd
 import gudhi.representations as tda
 from dotenv import load_dotenv
 import psycopg2
-
+import os
 load_dotenv(".env")
 
-VERBOSE = os.getenv("VERBOSE").lower.strip(" ") in ["t", "true", "1", "y", "yes"]
+VERBOSE = os.getenv("VERBOSE",'f').lower().strip(" ") in ["t", "true", "1", "y", "yes"]
 
 
 # persistence vector
