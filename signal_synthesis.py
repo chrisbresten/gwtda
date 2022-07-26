@@ -10,7 +10,7 @@ import sys
 from embeddings import slidend, dimred3
 import numpy as np
 
-ncoeff = 0.3  # coefficient that noise is scaled by
+ncoeff = 0.4  # coefficient that noise is scaled by
 Ndattotal = 1000
 Nchop = 512
 Nfactor = 1

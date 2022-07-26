@@ -1,3 +1,4 @@
+import ripserplusplus as rip
 import numpy as np
 import gudhi as gd
 import gudhi.representations as tda
@@ -140,6 +141,25 @@ def mkbothvec_alpha(data, Ntda, edgelen, Nint):
     h0 = _betti_vector(digs, epsvec, 0)
     h1 = _betti_vector(digs, epsvec, 1)
     return (h0, h1, out0, out1)
+
+def mkbothvec_ripser(data, Ntda, edgelen, Nint):
+    """makes betti vector and persistence vector, using computational
+    redundance that would be wasted if the functions called separately, using alpha complex"""
+    rap = rip.run(f"--format point-cloud --sparse --threshold {edgelen} --dim 2 --ratio 5",data)
+    ints0 = rap.get(0,[] )
+    epsvec = np.linspace(0, edgelen, Ntda)
+    ints1=rap.get(1,[])
+    out1 = _pdproc(ints1, Nint)
+    out0 = _pdproc(ints0, Nint)
+    digs = []
+    for i in ints1:
+        digs.append((1,i))
+    for i in ints0:
+        digs.append((0,i))
+    h0 = _betti_vector(digs, epsvec, 0)
+    h1 = _betti_vector(digs, epsvec, 1)
+    return (h0, h1, out0, out1)
+
 
 
 # sliding window functions and dimensional reduction

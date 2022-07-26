@@ -29,6 +29,7 @@ bettiout = []
 pdout = []
 swout = []
 yout = []
+print(Ndattotal)
 for j, pp in enumerate(pcloud):
     p = np.array(pp)
     print(" %s    %s" % (int(100 * j / len(pcloud)), "%"), end="\r")
@@ -40,5 +41,5 @@ for j, pp in enumerate(pcloud):
     yout.append(y[j])
     if j % int(Ndattotal / 10) == 0:
         savetda()
-        print("\n save %s percent" % (int(100 * j / N),))
+        print("\n save %s percent" % (int(100 * j / Ndattotal),))
 savetda(True)

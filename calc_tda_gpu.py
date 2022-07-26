@@ -24,7 +24,7 @@ Ksw = embeddings.sw_rep_embedding(Nrefs=50)
     Nsig,
     sigind,
 ) = np.load(loadfile, allow_pickle=True)
-outfile = "tda_" + loadfile.rstrip(".npy") + str(np.random.randint(10000))
+outfile = "tda_GPU" + loadfile.rstrip(".npy") + str(np.random.randint(10000))
 bettiout = []
 pdout = []
 swout = []
