@@ -1,1 +1,5 @@
-Currently this is used to run the CNN parts and doesnt need every dependency but will be tested to run everything
+This is a docker container, work in progress, to provide an environment to run this in for conveneience.
+
+it is made for use with nvidia-docker runtime
+
+

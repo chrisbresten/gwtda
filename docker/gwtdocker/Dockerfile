@@ -3,11 +3,12 @@ RUN apt-get update
 ENV DEBIAN_FRONTEND=noninteractive
 RUN set -e \
 &&  apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends --yes \
-python3-psycopg2
+python3-psycopg2 cmake
 RUN pip3 install tenacity
 RUN pip3 install gwtools
 RUN pip3 install pyastronomy
 RUN pip3 install gudhi
+RUN pip3 install ripserplusplus 
 
 RUN rm --recursive --force \
     /usr/share/doc/* \
