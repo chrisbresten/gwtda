@@ -145,7 +145,7 @@ def mkbothvec_alpha(data, Ntda, edgelen, Nint):
 def mkbothvec_ripser(data, Ntda, edgelen, Nint):
     """makes betti vector and persistence vector, using computational
     redundance that would be wasted if the functions called separately, using alpha complex"""
-    rap = rip.run(f"--format point-cloud --sparse --threshold {edgelen} --dim 2 --ratio 5",data)
+    rap = rip.run(f"--format point-cloud --threshold {edgelen} --dim 2 --ratio 5 --sparse",data)
     ints0 = rap.get(0,[] )
     epsvec = np.linspace(0, edgelen, Ntda)
     ints1=rap.get(1,[])
