@@ -21,7 +21,8 @@ except IndexError:
     )
 
 
-(x, y, xsig, xem) = prep4Classifier(loadfile, embedi)
+(x, y, xsig, xem) = prep4Classifier(loadfile, 'pd')
+x = xsig;
 Ndat = len(y)
 Ntest = int(Ndat / 10)
 x_train = x[0 : (Ndat - Ntest)]

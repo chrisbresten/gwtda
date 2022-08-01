@@ -1,6 +1,6 @@
 """run from command like run_CNN.py datafile_tda_features.npy <embedding> \n where <embedding> is one of{modes} @author Chris Brsten"""
 
-from tools import prep4Classifier
+from tools import prep4Classifier,vmodes
 from sklearn.metrics import roc_curve, auc
 from tools import serialize
 
@@ -12,13 +12,13 @@ import tensorflow as tf
 import numpy as np
 import sys
 
-
+modes = vmodes()
 try:
     loadfile = sys.argv[1]
     embedi = sys.argv[2]
 except IndexError:
     raise SystemExit(
-        f"Usage: {sys.argv[0]} datafile_tda_features.npy <embedding> \n where <embedding> is one of{modes}"
+        f"Usage: {sys.argv[0]} datafile_tda_features.npy <embedding> \n where <embedding> is one of {modes}"
     )
 
 

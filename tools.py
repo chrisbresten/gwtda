@@ -9,7 +9,7 @@ from termcolor import colored
 load_dotenv()
 
 import inspect 
-
+modes =  ["pd", "sw", "bv", "all", "bv1", "bv2", "pd1", "pd2"]
 
 s = spsql()
 SCHEMA = os.getenv("SCHEMA", "gw")
@@ -35,7 +35,8 @@ def tp(bo):
     return testcolor(bo)
 
 
-
+def vmodes():
+    return modes
 
 def serialize(x):
     """recursive function that converts nested arrays to lists and the numpy
@@ -85,7 +86,7 @@ def plot_signals(filen, show=True):
 
 
 def prep4Classifier(loadfile, embedi):
-    modes = ["pd", "sw", "bv", "all", "bv1", "bv2", "pd1", "pd2"]
+    modes = vmodes()
     """prepares the data for classification, input is file and embedding type, output is embedded signals and raw signals"""
     (
         filename_original,
