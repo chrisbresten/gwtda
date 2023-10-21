@@ -1,7 +1,5 @@
+## GWTDA 0.0.1
 
-GWTDA 0.0.1
-+++++++++++
-===========
 
 This is not software intended for endusers. This is at most the begining of TDA time series classification module, or something of that natre.
 
